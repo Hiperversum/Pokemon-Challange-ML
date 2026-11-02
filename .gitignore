@@ -1,0 +1,24 @@
+# Competition data (downloaded from Kaggle, not redistributed)
+/data/
+
+# Generated files
+/outputs/
+/submissions/
+*.csv
+!requirements.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Credentials
+.kaggle/
+kaggle.json
+access_token
+
+# Editors
+.vscode/
+.idea/

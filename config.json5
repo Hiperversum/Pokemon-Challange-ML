@@ -1,0 +1,119 @@
+// Project settings. Edit the values here, no need to touch the code.
+// Lines starting with // are comments and are ignored.
+{
+    ////////////////////////////////////////
+    // WHAT TO RUN
+    ////////////////////////////////////////
+    // Change the values below, then start:  python main.py
+    // Each command reads only the values it needs and ignores the others.
+    // The results are saved in outputs/: tables in outputs/results, Kaggle csv in outputs/submissions.
+    run: {
+        // What to do:
+        //   "compare-tuned"     accuracy (5-fold CV) of the tuned models and the ensembles  -> uses models
+        //   "compare"           accuracy (5-fold CV) of the models with default settings   -> uses models
+        //   "submit"            train on the whole train and write the csv for Kaggle      -> uses model
+        //   "tune"              GridSearchCV of one model                                  -> uses model
+        //   "optuna"            Optuna search of one model                                 -> uses model, trials
+        //   "ablation"          how much each group of features helps                      -> uses model
+        //   "pca"               experiment: the models with and without PCA                -> uses models
+        //   "polynomial"        experiment: logistic regression with polynomial features
+        //   "gradient-descent"  experiment: our gradient descent logistic regression
+        command: "submit",
+
+        // One model: a name from the MODEL NAMES list below
+        model: "voting",
+
+        // Several models, for example ["logreg", "catboost"]. [] = all of them
+        models: [],
+
+        // How many hyperparameter combinations Optuna tries
+        trials: 50,
+    },
+
+    ////////////////////////////////////////
+    // MODEL NAMES
+    ////////////////////////////////////////
+    // Single models:
+    //   logreg                  logistic regression
+    //   gd_logreg               our logistic regression trained with gradient descent
+    //   knn                     k nearest neighbours
+    //   tree                    decision tree
+    //   random_forest           random forest
+    //   adaboost                AdaBoost
+    //   gradient_boosting       gradient boosting
+    //   hist_gradient_boosting  histogram gradient boosting
+    //   xgboost                 XGBoost
+    //   catboost                CatBoost
+    //
+    // Ensembles, several tuned models together (only for compare-tuned and submit):
+    //   voting         average of logreg, gradient_boosting, hist_gradient_boosting
+    //   voting_all     average of logreg, gradient_boosting, hist_gradient_boosting, gd_logreg, random_forest
+    //   stacking       logreg, gradient_boosting, hist_gradient_boosting, random_forest
+    //                  combined by a logistic regression
+    //   voting_best    average of the 5 best: logreg, catboost, xgboost, gradient_boosting,
+    //                  hist_gradient_boosting
+    //   stacking_best  the same 5 best combined by a logistic regression
+    //
+    // tune works with:   logreg, gd_logreg, knn, tree, random_forest, adaboost,
+    //                    gradient_boosting, hist_gradient_boosting
+    // optuna works with: xgboost, catboost, logreg, hist_gradient_boosting
+
+    ////////////////////////////////////////
+    // COMMANDS
+    ////////////////////////////////////////
+    // The script of each command and the values of "run" it reads. No need to change this part.
+    commands: {
+        "compare":          { script: "scripts/evaluation/compare_models.py", reads: ["models"] },
+        "compare-tuned":    { script: "scripts/evaluation/compare_tuned.py", reads: ["models"] },
+        "submit":           { script: "scripts/submission/make_submission.py", reads: ["model"] },
+        "tune":             { script: "scripts/evaluation/tune_model.py", reads: ["model"] },
+        "optuna":           { script: "scripts/evaluation/optuna_model.py", reads: ["model", "trials"] },
+        "ablation":         { script: "scripts/evaluation/feature_ablation.py", reads: ["model"] },
+        "pca":              { script: "scripts/experiments/pca_experiment.py", reads: ["models"] },
+        "polynomial":       { script: "scripts/experiments/polynomial_experiment.py", reads: [] },
+        "gradient-descent": { script: "scripts/experiments/gradient_descent_experiment.py", reads: [] },
+    },
+
+    ////////////////////////////////////////
+    // DATASET
+    ////////////////////////////////////////
+    dataset: {
+        // Folder that contains the competition files below.
+        // null = find it automatically (data/ in the project, or the Kaggle
+        // input folder when the code runs on Kaggle).
+        // To choose a folder write its path, for example "D:/kaggle_data".
+        // A relative path starts from the project folder.
+        data_dir: null,
+
+        // File names inside that folder
+        train: "train.jsonl",
+        test: "test.jsonl",
+        type_chart: "type_chart_gen2.csv",
+        sample_submission: "sample_submission.csv",
+
+        // What we want to predict (1 = Player 1 wins)
+        target_column: "player_won",
+        // The identifier of each battle
+        id_column: "battle_id",
+    },
+
+    ////////////////////////////////////////
+    // OUTPUT
+    ////////////////////////////////////////
+    output: {
+        // Folder where the files are written: the tables go in its results/ subfolder,
+        // the csv for Kaggle in its submissions/ subfolder.
+        // null = outputs/ in the project (on Kaggle: the working folder, without subfolders).
+        dir: null,
+    },
+
+    ////////////////////////////////////////
+    // VALIDATION
+    ////////////////////////////////////////
+    validation: {
+        // Seed of the random numbers: keep it fixed so results can be reproduced
+        random_state: 23081999,
+        // Number of folds of the cross-validation
+        n_folds: 5,
+    },
+}
