@@ -17,7 +17,7 @@ def main():
     X, y, _ = load_dataset()
     print_step(f"Tuning {model} with Optuna")
     best_params, table = optuna_search(model, X.values, y.values, n_trials=trials)
-    out_path = get_output_dir() / f"optuna_{model}.csv"
+    out_path = get_output_dir("optuna") / f"optuna_{model}.csv"
     table.to_csv(out_path, index=False)
     columns = ["number", "value"] + [c for c in table.columns if c.startswith("params_")]
     print_section("Top 10 trials")

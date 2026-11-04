@@ -19,7 +19,7 @@ def main():
     models = {name: build_model(name) for name in names}
     print_step(f"Cross-validating {len(models)} models with {N_FOLDS} folds")
     table = compare_models(models, X.values, y.values)
-    out_path = get_output_dir() / "model_comparison.csv"
+    out_path = get_output_dir("compare") / "model_comparison.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")
     print_table(table)

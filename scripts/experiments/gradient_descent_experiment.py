@@ -38,7 +38,7 @@ def main():
     """Save the cost histories and compare the models with k-fold."""
     X, y, _ = load_dataset()
     X, y = X.values, y.values
-    out_dir = get_output_dir()
+    out_dir = get_output_dir("gradient_descent")
     cost_path = out_dir / "gd_cost_history.csv"
     cost_histories(X, y).to_csv(cost_path, index=False)
     print_saved(cost_path)

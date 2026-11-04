@@ -40,7 +40,7 @@ def main():
                      "val_acc": result["val_acc"], "val_std": result["val_std"]})
         print(f"{name:<26} train={result['train_acc']:.4f}  "
               f"val={result['val_acc']:.4f} +/- {result['val_std']:.4f}", flush=True)
-    out_path = get_output_dir() / "polynomial_experiment.csv"
+    out_path = get_output_dir("polynomial") / "polynomial_experiment.csv"
     pd.DataFrame(rows).to_csv(out_path, index=False)
     print_saved(out_path)
 

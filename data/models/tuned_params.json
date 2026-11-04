@@ -1,10 +1,10 @@
 {
     "logreg": {
         "params": {
-            "C": 0.03,
+            "C": 0.02996,
             "penalty": "l1"
         },
-        "val_acc": 0.6819
+        "val_acc": 0.682
     },
     "gd_logreg": {
         "params": {

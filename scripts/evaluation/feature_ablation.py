@@ -33,13 +33,13 @@ def main():
         print_step(f"[{position}/{len(settings)}] Setting: {label}")
         X, y, _ = load_dataset(groups=groups)
         result = cross_validate(build_tuned_model(model), X.values, y.values)
-        rows.append({"setting": label, "n_features": X.shape[1],
+        rows.append({"model": model, "setting": label, "n_features": X.shape[1],
                      "val_acc": result["val_acc"], "val_std": result["val_std"]})
         print_scores(f"{label} ({X.shape[1]} features)", result["train_acc"], result["val_acc"],
                      result["val_std"], width=40)
 
     table = pd.DataFrame(rows)
-    out_path = get_output_dir() / f"ablation_{model}.csv"
+    out_path = get_output_dir("ablation") / f"ablation_{model}.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")
     print_table(table)

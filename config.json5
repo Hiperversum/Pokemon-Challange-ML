@@ -6,7 +6,8 @@
     ////////////////////////////////////////
     // Change the values below, then start:  python main.py
     // Each command reads only the values it needs and ignores the others.
-    // The results are saved in outputs/: tables in outputs/results, Kaggle csv in outputs/submissions.
+    // Each command saves its files in its own folder: outputs/<command>_results
+    // (for example outputs/ablation_results; the csv for Kaggle go in outputs/submission_results).
     run: {
         // What to do:
         //   "compare-tuned"     accuracy (5-fold CV) of the tuned models and the ensembles  -> uses models
@@ -100,6 +101,7 @@
         // Folder where the files are written: the tables go in its results/ subfolder,
         // the csv for Kaggle in its submissions/ subfolder.
         // null = outputs/ in the project (on Kaggle: the working folder, without subfolders).
+        // Inside it each script has its own folder, for example outputs/ablation_results.
         dir: null,
     },
 

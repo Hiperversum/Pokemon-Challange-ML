@@ -25,7 +25,7 @@ def make_submission(test_ids, predictions, file_name="submission.csv"):
     """Write predictions in the sample_submission format and return the file path."""
     # One row per test battle: its id and the predicted winner (1 = Player 1)
     submission = pd.DataFrame({ID_COLUMN: test_ids, TARGET: predictions})
-    path = get_output_dir("submissions") / file_name
+    path = get_output_dir("submission") / file_name
     submission.to_csv(path, index=False)
     return path
 

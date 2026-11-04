@@ -22,7 +22,7 @@ def main():
               for name in names}
     print_step(f"Cross-validating {len(models)} tuned models and ensembles with {N_FOLDS} folds")
     table = compare_models(models, X.values, y.values)
-    out_path = get_output_dir() / "tuned_comparison.csv"
+    out_path = get_output_dir("compare_tuned") / "tuned_comparison.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")
     print_table(table)

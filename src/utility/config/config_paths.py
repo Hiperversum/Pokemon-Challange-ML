@@ -55,12 +55,13 @@ def get_output_root():
     return OUTPUT_DIR
 
 
-def get_output_dir(kind="results"):
-    """Return the folder of one kind of output: "results" (tables) or "submissions" (csv for Kaggle).
+def get_output_dir(script):
+    """Return the folder where one script writes its files: outputs/<script>_results.
 
+    For example get_output_dir("ablation") is outputs/ablation_results.
     On Kaggle the files stay directly in the working folder, where the notebook output can be submitted.
     """
     root = get_output_root()
-    out = root if root == KAGGLE_WORKING_DIR else root / kind
+    out = root if root == KAGGLE_WORKING_DIR else root / f"{script}_results"
     out.mkdir(parents=True, exist_ok=True)
     return out

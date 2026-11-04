@@ -69,7 +69,7 @@ def main():
                   f"val={result['val_acc']:.4f} +/- {result['val_std']:.4f}", flush=True)
 
     table = pd.DataFrame(rows)
-    out_path = get_output_dir() / "pca_experiment.csv"
+    out_path = get_output_dir("pca") / "pca_experiment.csv"
     table.to_csv(out_path, index=False)
     print_saved(out_path)
 
