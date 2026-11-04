@@ -20,10 +20,6 @@ OPTUNA_SPACES = {
         "C": trial.suggest_float("C", 1e-4, 1.0, log=True),
         "penalty": trial.suggest_categorical("penalty", ["l1", "l2"]),
     },
-    "gd_logreg": lambda trial: {
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
-        "l2": trial.suggest_float("l2", 0.001, 1.0, log=True),
-    },
     "knn": lambda trial: {
         "n_neighbors": trial.suggest_int("n_neighbors", 5, 200),
         "weights": trial.suggest_categorical("weights", ["uniform", "distance"]),
@@ -36,16 +32,6 @@ OPTUNA_SPACES = {
         "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 20),
         "max_features": trial.suggest_float("max_features", 0.02, 0.3, log=True),
     },
-    "adaboost": lambda trial: {
-        "n_estimators": trial.suggest_int("n_estimators", 100, 800, step=50),
-        "learning_rate": trial.suggest_float("learning_rate", 0.05, 1.5, log=True),
-    },
-    "gradient_boosting": lambda trial: {
-        "n_estimators": trial.suggest_int("n_estimators", 100, 800, step=50),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
-        "max_depth": trial.suggest_int("max_depth", 1, 4),
-        "subsample": trial.suggest_float("subsample", 0.5, 1.0),
-    },
     "xgboost": lambda trial: {
         "n_estimators": trial.suggest_int("n_estimators", 100, 1000, step=50),
         "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
@@ -54,19 +40,6 @@ OPTUNA_SPACES = {
         "subsample": trial.suggest_float("subsample", 0.5, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.1, 1.0),
         "reg_lambda": trial.suggest_float("reg_lambda", 0.01, 30.0, log=True),
-    },
-    "catboost": lambda trial: {
-        "iterations": trial.suggest_int("iterations", 200, 1500, step=100),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
-        "depth": trial.suggest_int("depth", 2, 8),
-        "l2_leaf_reg": trial.suggest_float("l2_leaf_reg", 1.0, 30.0, log=True),
-    },
-    "hist_gradient_boosting": lambda trial: {
-        "max_iter": trial.suggest_int("max_iter", 100, 800, step=50),
-        "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.1, log=True),
-        "max_leaf_nodes": trial.suggest_int("max_leaf_nodes", 4, 63),
-        "min_samples_leaf": trial.suggest_int("min_samples_leaf", 10, 200),
-        "l2_regularization": trial.suggest_float("l2_regularization", 0.01, 30.0, log=True),
     },
 }
 

@@ -18,13 +18,12 @@
        
         //   "pca"               experiment: the models with and without PCA                
         //   "polynomial"        experiment: logistic regression with polynomial features
-        //   "gradient-descent"  experiment: our gradient descent logistic regression
         command: "submit",
 
         // One model: a name from the MODEL NAMES list below
         model: "voting",
 
-        // Several models, for example ["logreg", "catboost"]. [] = all of them
+        // Several models, for example ["logreg", "xgboost"]. [] = all of them
         models: [],
 
         // How many hyperparameter combinations Optuna tries
@@ -36,25 +35,15 @@
     ////////////////////////////////////////
     // Single models:
     //   logreg                  logistic regression
-    //   gd_logreg               our logistic regression trained with gradient descent
     //   knn                     k nearest neighbours
     //   tree                    decision tree
     //   random_forest           random forest
-    //   adaboost                AdaBoost
-    //   gradient_boosting       gradient boosting
-    //   hist_gradient_boosting  histogram gradient boosting
     //   xgboost                 XGBoost
-    //   catboost                CatBoost
     //
     // Ensembles, several tuned models together (only for compare-tuned and submit),
     // defined in data/models/ensembles.json:
-    //   voting         average of logreg, gradient_boosting, hist_gradient_boosting
-    //   voting_all     average of logreg, gradient_boosting, hist_gradient_boosting, gd_logreg, random_forest
-    //   stacking       logreg, gradient_boosting, hist_gradient_boosting, random_forest
-    //                  combined by a logistic regression
-    //   voting_best    average of the 5 best: logreg, catboost, xgboost, gradient_boosting,
-    //                  hist_gradient_boosting
-    //   stacking_best  the same 5 best combined by a logistic regression
+    //   voting         average of logreg, knn, random_forest, xgboost
+    //   stacking       the same four models combined by a logistic regression
     //
     // tune works with all the single models (each one has a search space in src/evaluation/tuning.py)
 
@@ -70,7 +59,6 @@
         "ablation":         "scripts/evaluation/feature_ablation.py",
         "pca":              "scripts/experiments/pca.py",
         "polynomial":       "scripts/experiments/polynomial.py",
-        "gradient-descent": "scripts/experiments/gradient_descent.py",
     },
 
     ////////////////////////////////////////

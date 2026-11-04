@@ -89,8 +89,8 @@ def main():
     # MODELS AND FEATURES
     #---------------------------
 
-    # The models written in config.json5 ([] = logreg, knn, hist_gradient_boosting)
-    names = run_models(["logreg", "knn", "hist_gradient_boosting"], allowed=MODEL_FACTORIES)
+    # The models written in config.json5 ([] = logreg, knn, xgboost)
+    names = run_models(["logreg", "knn", "xgboost"], allowed=MODEL_FACTORIES)
     X, y, _ = load_dataset()
 
     # Positions of the bag columns (the models receive X.values, a table without column names)

@@ -6,13 +6,8 @@
 """
 
 from ...utility.model.load_params import load_ensembles, load_tuned_models
-from ..classifiers.adaboost import adaboost
-from ..classifiers.catboost import catboost
 from ..classifiers.decision_tree import decision_tree
 from ..classifiers.ensemble import stacking_ensemble, voting_ensemble
-from ..classifiers.gd_logistic_regression import gd_logistic_regression
-from ..classifiers.gradient_boosting import gradient_boosting
-from ..classifiers.hist_gradient_boosting import hist_gradient_boosting
 from ..classifiers.knn import knn
 from ..classifiers.logistic_regression import logistic_regression
 from ..classifiers.random_forest import random_forest
@@ -25,15 +20,10 @@ from ..classifiers.xgboost import xgboost
 
 MODEL_FACTORIES = {
     "logreg": logistic_regression,
-    "gd_logreg": gd_logistic_regression,
     "knn": knn,
     "tree": decision_tree,
     "random_forest": random_forest,
-    "adaboost": adaboost,
-    "gradient_boosting": gradient_boosting,
-    "hist_gradient_boosting": hist_gradient_boosting,
     "xgboost": xgboost,
-    "catboost": catboost,
 }
 
 
@@ -70,11 +60,11 @@ ENSEMBLES = load_ensembles()
 
 
 def build_ensemble(name):
-    """Create one of the ensembles of ensembles.json, each member with its tuned hyperparameters."""
+    """Create one of the ensembles of ensembles.json, each member with its tuned hyperparameters (if any)."""
     spec = ENSEMBLES[name]
 
-    # The members, as (name, model) pairs, each one with its tuned hyperparameters
-    members = [(member, build_model(member, **TUNED_MODELS[member])) for member in spec["models"]]
+    # The members, as (name, model) pairs; a model that was not tuned (knn) keeps its defaults
+    members = [(member, build_tuned_model(member)) for member in spec["models"]]
 
     # Soft voting averages the probabilities; stacking weighs them with a logistic regression
     if spec["type"] == "voting":

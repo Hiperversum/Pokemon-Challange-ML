@@ -29,8 +29,7 @@ Pokemon-Challange-ML/
 │   │   └── tune_model.py        Optuna search of the hyperparameters of one model
 │   ├── experiments/
 │   │   ├── pca.py               PCA on all features or on the bags only
-│   │   ├── polynomial.py        polynomial features for logistic regression
-│   │   └── gradient_descent.py  our gradient descent logistic regression
+│   │   └── polynomial.py        polynomial features for logistic regression
 │   └── submission/
 │       └── make_submission.py   fit on full train set and write a submission
 └── src/
@@ -50,10 +49,8 @@ Pokemon-Challange-ML/
     │   ├── core/
     │   │   ├── model_builder.py   catalog of the models, build_model, tuned models and ensembles
     │   │   └── preprocessing.py   StandardScaler (and PCA) in front of a model
-    │   ├── classifiers/       one file per model: logistic_regression, gd_logistic_regression
-    │   │                      (our gradient descent), knn, decision_tree, random_forest, adaboost,
-    │   │                      gradient_boosting, hist_gradient_boosting, xgboost, catboost,
-    │   │                      ensemble (voting and stacking)
+    │   ├── classifiers/       one file per model: logistic_regression, knn, decision_tree,
+    │   │                      random_forest, xgboost, ensemble (voting and stacking)
     │   └── submission.py      fit on the train set, predict the test, write the csv
     ├── evaluation/
     │   ├── validation.py      stratified k-fold cross-validation
@@ -109,7 +106,7 @@ Each command reads only the values it needs. The names of all the models are lis
 in the same file, section "MODEL NAMES".
 
 Commands: `compare`, `compare-tuned`, `ablation`, `tune`, `pca`, `polynomial`,
-`gradient-descent`, `submit`. The same file also holds the data folder, file names,
+`submit`. The same file also holds the data folder, file names,
 seed and number of folds. Everything starts from `main.py`: each script reads the values it needs (model,
 models, trials) from this file.
 
@@ -125,5 +122,6 @@ models, trials) from this file.
    - *bags*: counts of species and moves seen in the battle.
 2. **Validation**: stratified 5-fold cross-validation on `train.jsonl`; the
    public leaderboard is only used as a sanity check.
-3. **Models**: logistic regression (L1/L2), kNN, decision tree, random forest,
-   AdaBoost, gradient boosting, XGBoost, CatBoost, then soft voting and stacking ensembles.
+3. **Models**: logistic regression (L1/L2), kNN, decision tree, random forest and
+   XGBoost, then soft voting and stacking ensembles of logistic regression, kNN,
+   random forest and XGBoost.

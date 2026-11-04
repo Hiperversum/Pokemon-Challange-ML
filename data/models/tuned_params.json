@@ -6,38 +6,12 @@
         },
         "val_acc": 0.682
     },
-    "gd_logreg": {
-        "params": {
-            "learning_rate": 0.09419,
-            "l2": 0.213
-        },
-        "val_acc": 0.6775
-    },
     "random_forest": {
         "params": {
             "min_samples_leaf": 2,
             "max_features": 0.02859
         },
         "val_acc": 0.6748
-    },
-    "gradient_boosting": {
-        "params": {
-            "learning_rate": 0.02763516840519,
-            "max_depth": 2,
-            "n_estimators": 600,
-            "subsample": 0.6401758404757077
-        },
-        "val_acc": 0.6802
-    },
-    "hist_gradient_boosting": {
-        "params": {
-            "l2_regularization": 0.5092397870788871,
-            "learning_rate": 0.0182841544981886,
-            "max_iter": 800,
-            "max_leaf_nodes": 15,
-            "min_samples_leaf": 111
-        },
-        "val_acc": 0.6825
     },
     "xgboost": {
         "params": {
@@ -50,14 +24,5 @@
             "reg_lambda": 0.0134
         },
         "val_acc": 0.6825
-    },
-    "catboost": {
-        "params": {
-            "iterations": 1200,
-            "learning_rate": 0.022,
-            "depth": 6,
-            "l2_leaf_reg": 3.53
-        },
-        "val_acc": 0.683
     }
 }
