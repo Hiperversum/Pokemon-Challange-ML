@@ -44,7 +44,8 @@ Pokemon-Challange-ML/
     │       ├── lead.py        Player 2 lead against Player 1 lead
     │       ├── matchup.py     type matchups against Player 2's lead
     │       ├── timeline.py    state of the battle after 30 turns
-    │       └── bags.py        species and moves counts (bag of tokens)
+    │       ├── bags.py        species and moves counts (bag of tokens)
+    │       └── endstate.py    detailed end state, hidden KOs, HP trend, HP left per species
     ├── models/
     │   ├── core/
     │   │   ├── model_builder.py   catalog of the models, build_model, tuned models and ensembles
@@ -120,6 +121,9 @@ models, trials) from this file.
      healed, switches, move categories, super effective hits, boosts and
      snapshots at turns 10 and 20; differences Player 1 - Player 2.
    - *bags*: counts of species and moves seen in the battle.
+   - *endstate*: health of the Pokemon still alive, low-HP Player 2 Pokemon on the
+     bench treated as hidden KOs, trend of the HP difference during the 30 turns,
+     HP left of each frequent species.
 2. **Validation**: stratified 5-fold cross-validation on `train.jsonl`; the
    public leaderboard is only used as a sanity check.
 3. **Models**: logistic regression (L1/L2), kNN, decision tree, random forest and

@@ -4,6 +4,7 @@ import pandas as pd
 
 from ...utility.config.config_constants import ID_COLUMN, TARGET
 from ..groups.bags import BagOfTokens
+from ..groups.endstate import EndState
 from ..groups.matchup import matchup_features
 from ..groups.lead import lead_features
 from ..groups.team import team_features
@@ -21,7 +22,7 @@ class FeatureBuilder:
     Call fit() on the training battles before transform().
     """
 
-    GROUPS = ("team", "lead", "matchup", "timeline", "bags")
+    GROUPS = ("team", "lead", "matchup", "timeline", "bags", "endstate")
 
     #---------------------------
     # CREATE: keep the tools and choose the groups
@@ -35,17 +36,20 @@ class FeatureBuilder:
         # The groups to compute: all of them unless a list is given (ablation)
         self.groups = tuple(groups) if groups else self.GROUPS
 
-        # The bags still have no vocabulary: fit() will learn it
+        # The groups that still have to learn from the training battles: fit() will do it
         self.bags = BagOfTokens(min_count=bag_min_count)
+        self.endstate = EndState()
 
     #---------------------------
     # FIT: learn from the training battles
     #---------------------------
 
     def fit(self, battles):
-        """Learn the parts that depend on the data (the bag vocabulary)."""
+        """Learn the parts that depend on the data (the bag and species vocabularies)."""
         if "bags" in self.groups:
             self.bags.fit(battles)
+        if "endstate" in self.groups:
+            self.endstate.fit(battles)
         return self
 
     #---------------------------
@@ -66,6 +70,8 @@ class FeatureBuilder:
             feats.update(timeline_features(battle, self.pokedex, self.type_chart))
         if "bags" in self.groups:
             feats.update(self.bags.features(battle))
+        if "endstate" in self.groups:
+            feats.update(self.endstate.features(battle, self.pokedex))
         return feats
 
     def transform(self, battles):

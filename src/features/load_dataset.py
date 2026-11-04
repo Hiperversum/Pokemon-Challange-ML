@@ -14,8 +14,8 @@ from .core.type_chart import TypeChart
 def load_dataset(groups=None, data_dir=None):
     """Load train and test battles and return (X_train, y_train, X_test).
 
-    Everything that is learned from the data (the Pokedex and the bag vocabulary) comes
-    from train.jsonl only: the competition rules allow test.jsonl only for the predictions.
+    Everything that is learned from the data (the Pokedex, the bag and species vocabularies)
+    comes from train.jsonl only: the competition rules allow test.jsonl only for the predictions.
     """
     # Read the battles (one dictionary each) and build the Pokedex and the type chart
     with timed_step("Reading the battles, the Pokedex and the type chart"):
