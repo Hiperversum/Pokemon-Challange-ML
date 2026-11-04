@@ -4,6 +4,8 @@ import pandas as pd
 
 from ... import config
 from ..groups.bags import BagOfTokens
+from ..groups.endstate import EndState
+from ..groups.simulation import BattleSimulation
 from ..groups.matchup import matchup_features
 from ..groups.lead import lead_features
 from ..groups.team import team_features
@@ -21,7 +23,7 @@ class FeatureBuilder:
     Call fit() on the training battles before transform().
     """
 
-    GROUPS = ("team", "lead", "matchup", "timeline", "bags")
+    GROUPS = ("team", "lead", "matchup", "timeline", "bags", "endstate", "simulation")
 
     #---------------------------
     # CREATE: keep the tools and choose the groups
@@ -37,15 +39,23 @@ class FeatureBuilder:
 
         # The bags still have no vocabulary: fit() will learn it
         self.bags = BagOfTokens(min_count=bag_min_count)
+        # The species vocabulary of the end-state group is also learned in fit()
+        self.endstate = EndState()
+        # The simulation learns species stats, types and usual attacks in fit()
+        self.simulation = BattleSimulation(type_chart)
 
     #---------------------------
     # FIT: learn from the training battles
     #---------------------------
 
     def fit(self, battles):
-        """Learn the parts that depend on the data (the bag vocabulary)."""
+        """Learn the parts that depend on the data (the bag and species vocabularies)."""
         if "bags" in self.groups:
             self.bags.fit(battles)
+        if "endstate" in self.groups:
+            self.endstate.fit(battles)
+        if "simulation" in self.groups:
+            self.simulation.fit(battles)
         return self
 
     #---------------------------
@@ -66,6 +76,10 @@ class FeatureBuilder:
             feats.update(timeline_features(battle, self.pokedex, self.type_chart))
         if "bags" in self.groups:
             feats.update(self.bags.features(battle))
+        if "endstate" in self.groups:
+            feats.update(self.endstate.features(battle, self.pokedex))
+        if "simulation" in self.groups:
+            feats.update(self.simulation.features(battle))
         return feats
 
     def transform(self, battles):

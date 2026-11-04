@@ -72,6 +72,17 @@ def polynomial_logistic_regression(columns, degree=2, C=0.1, penalty="l2"):
     ])
 
 
+def logistic_regression_pca_on(columns, n_components=20, C=0.02, penalty="l1"):
+    """Logistic regression where only the given columns are compressed with PCA first.
+
+    Used on the bag-of-tokens counts: hundreds of sparse columns become a few components,
+    while the dense battle features (HP, KOs, statuses...) are kept as they are.
+    """
+    solver = "liblinear" if penalty == "l1" else "lbfgs"
+    estimator = LogisticRegression(C=C, penalty=penalty, solver=solver, max_iter=5000)
+    return pca_on_columns(estimator, columns, n_components)
+
+
 def gd_logistic_regression(learning_rate=0.1, n_epochs=300, batch_size=None, l2=0.01):
     """Logistic regression trained with our gradient descent on standardized features."""
     return scaled(GradientDescentLogisticRegression(

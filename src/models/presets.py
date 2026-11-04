@@ -5,7 +5,7 @@ optuna_model.py with Optuna). The comments show the 5-fold stratified CV accurac
 (seed 42 for the GridSearchCV ones, seed 23081999 for the Optuna ones).
 """
 
-from .catalog import build_model
+from .catalog import build_model, logistic_regression_pca_on
 from .ensemble import stacking_ensemble, voting_ensemble
 
 
@@ -16,7 +16,8 @@ from .ensemble import stacking_ensemble, voting_ensemble
 TUNED_MODELS = {
     # Found with GridSearchCV
     "gradient_boosting": {"n_estimators": 400, "learning_rate": 0.05, "max_depth": 2},  # 0.6828
-    "logreg": {"C": 0.03, "penalty": "l1"},  # 0.6820
+    # Re-tuned on the features with the endstate group (5-fold CV repeated 3 times)
+    "logreg": {"C": 0.02, "penalty": "l1"},  # 0.6841 (0.6820 with C=0.03 on the old features)
     "hist_gradient_boosting": {
         "max_iter": 400, "learning_rate": 0.05, "max_leaf_nodes": 15, "min_samples_leaf": 50,
     },  # 0.6809
@@ -43,6 +44,22 @@ def build_tuned_model(name):
 
 
 ####################################################################################
+# MODELS WITH PCA ON SOME COLUMNS
+####################################################################################
+
+# These models need to know which columns to compress, so they are built from the
+# feature names (the columns of X_train) instead of having fixed settings.
+# PCA on the 441 bag columns -> 20 components, then L1 logistic regression: 0.6833
+# (5-fold CV repeated 3 times), the same as without PCA but with ~420 fewer inputs.
+PCA_SETTINGS = {"n_components": 20, "C": 0.02, "penalty": "l1"}
+
+PCA_MODELS = {
+    "pca_logistic": lambda names: logistic_regression_pca_on(
+        [i for i, name in enumerate(names) if name.startswith("bag_")], **PCA_SETTINGS),
+}
+
+
+####################################################################################
 # ENSEMBLES
 ####################################################################################
 
@@ -66,3 +83,12 @@ ENSEMBLES = {
 def build_ensemble(name):
     """Create one of the named ensembles."""
     return ENSEMBLES[name]()
+
+
+def build_named_model(name, feature_names):
+    """Create any model by name: a PCA model, an ensemble or a tuned single model."""
+    if name in PCA_MODELS:
+        return PCA_MODELS[name](list(feature_names))
+    if name in ENSEMBLES:
+        return build_ensemble(name)
+    return build_tuned_model(name)

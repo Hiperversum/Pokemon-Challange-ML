@@ -44,7 +44,9 @@ Pokemon-Challange-ML/
     │       ├── lead.py        Player 2 lead against Player 1 lead
     │       ├── matchup.py     type matchups against Player 2's lead
     │       ├── timeline.py    state of the battle after 30 turns
-    │       └── bags.py        species and moves counts (bag of tokens)
+    │       ├── bags.py        species and moves counts (bag of tokens)
+    │       ├── endstate.py    detailed state of the battle at turn 30
+    │       └── simulation.py  plays out the rest of the battle from turn 30 (Gen 2 rules)
     ├── models/
     │   ├── catalog.py         logistic regression, kNN, tree, RF, boosting, XGBoost, CatBoost
     │   ├── gradient_descent.py logistic regression trained with gradient descent
@@ -114,6 +116,14 @@ seed and number of folds. Every script in `scripts/` can still be started alone
      healed, switches, move categories, super effective hits, boosts and
      snapshots at turns 10 and 20; differences Player 1 - Player 2.
    - *bags*: counts of species and moves seen in the battle.
+   - *endstate*: detailed state at turn 30: alive/healthy/asleep Pokemon, Player 2
+     Pokemon benched with low HP (probable hidden KOs: Player 2 faints are recorded
+     far less often than Player 1 faints), status-weighted HP, trend of the HP
+     difference over the 30 turns, spikes, boosts and the HP left of each frequent species.
+   - *simulation*: from the snapshot at turn 30, the rest of the battle is played out with
+     simplified Gen 2 rules (real stats, damage formula with STAB and type chart, speed order,
+     statuses, Leftovers, best counter sent after each KO). Features: who wins the simulation,
+     HP and Pokemon left, share of 1-vs-1 duels won, duel of the two active Pokemon.
 2. **Validation**: stratified 5-fold cross-validation on `train.jsonl`; the
    public leaderboard is only used as a sanity check.
 3. **Models**: logistic regression (L1/L2), kNN, decision tree, random forest,

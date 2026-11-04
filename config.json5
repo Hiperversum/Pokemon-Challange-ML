@@ -21,7 +21,7 @@
         command: "submit",
 
         // One model: a name from the MODEL NAMES list below
-        model: "voting",
+        model: "pca_logistic",
 
         // Several models, for example ["logreg", "catboost"]. [] = all of them
         models: [],
@@ -44,6 +44,10 @@
     //   hist_gradient_boosting  histogram gradient boosting
     //   xgboost                 XGBoost
     //   catboost                CatBoost
+    //
+    // Logistic regression with PCA (only for submit):
+    //   pca_logistic     the 441 bag columns compressed by PCA into 20 components,
+    //                    then L1 logistic regression on everything (standardized)
     //
     // Ensembles, several tuned models together (only for compare-tuned and submit):
     //   voting         average of logreg, gradient_boosting, hist_gradient_boosting
