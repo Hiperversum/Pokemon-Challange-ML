@@ -11,11 +11,10 @@ from .validation import make_folds
 
 
 ####################################################################################
-# OPTUNA
+# OPTUNA SPACES:
 ####################################################################################
 
-# For each model: a function that asks Optuna for one value of every hyperparameter.
-# Optuna learns from the previous trials which values look promising (it does not try them all).
+# For each model: a function that asks Optuna for one value of every hyperparameter.W
 OPTUNA_SPACES = {
     "logreg": lambda trial: {
         "C": trial.suggest_float("C", 1e-4, 1.0, log=True),
@@ -72,13 +71,19 @@ OPTUNA_SPACES = {
 }
 
 
+####################################################################################
+# OPTUNA SEARCH: 
+####################################################################################
+
 def optuna_search(name, X, y, n_trials=50, n_folds=N_FOLDS):
     """Search the hyperparameters of one model with Optuna and return (best params, trials table).
 
     Every trial is scored with the same stratified k-fold used everywhere in the project.
     """
+    # Remove the Optuna messages that are annoying when running many trials
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 
+    # Function
     def objective(trial):
         """Score one set of hyperparameters with k-fold accuracy."""
         model = build_model(name, **OPTUNA_SPACES[name](trial))
@@ -89,6 +94,7 @@ def optuna_search(name, X, y, n_trials=50, n_folds=N_FOLDS):
         """Print one line after each trial."""
         print_trial(trial.number + 1, n_trials, trial.value, study.best_value)
 
+    # Start the study
     print_info("trials", f"{n_trials} x {n_folds} folds = {n_trials * n_folds} fits")
     study = optuna.create_study(
             direction="maximize", sampler=optuna.samplers.TPESampler(seed=RANDOM_STATE)

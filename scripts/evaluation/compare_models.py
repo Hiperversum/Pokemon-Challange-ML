@@ -12,13 +12,34 @@ from src.features.load_dataset import load_dataset
 from src.utility.print.messages import print_saved, print_section, print_step, print_table
 
 
+####################################################################################
+# COMPARE THE BASE MODELS: k-fold accuracy with the default hyperparameters
+####################################################################################
+
 def main():
     """Build the features and print the cross-validation table."""
+
+    #---------------------------
+    # MODELS AND FEATURES
+    #---------------------------
+
+    # The models written in config.json5 ([] = all the models of the catalog)
     names = run_models(MODEL_FACTORIES)
     X, y, _ = load_dataset()
+    # Each model with the default hyperparameters of catalog.py
     models = {name: build_model(name) for name in names}
+
+    #---------------------------
+    # CROSS-VALIDATION: one row per model, sorted by validation accuracy
+    #---------------------------
+
     print_step(f"Cross-validating {len(models)} models with {N_FOLDS} folds")
     table = compare_models(models, X.values, y.values)
+
+    #---------------------------
+    # SAVE AND SHOW THE TABLE
+    #---------------------------
+
     out_path = get_output_dir("compare") / "model_comparison.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")

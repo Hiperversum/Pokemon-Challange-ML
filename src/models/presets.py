@@ -1,7 +1,7 @@
 """Tuned models and named ensembles used for the final submissions.
 
 The hyperparameters of the tuned models are read from data/models/tuned_params.json,
-which the optuna command (scripts/evaluation/optuna_model.py) updates by itself.
+which the tune command (scripts/evaluation/tune_model.py, with Optuna) updates by itself.
 """
 
 from ..utility.model.load_params import load_tuned_models

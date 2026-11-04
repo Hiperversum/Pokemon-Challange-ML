@@ -121,6 +121,16 @@ def print_trial(number, total, score, best):
     print(f"  trial {number:>3}/{total}  val={score:.4f}  best={best:.4f}{marker}", flush=True)
 
 
+def print_params_update(name, new_val_acc, old_val_acc, saved):
+    """Say whether tuned_params.json now holds the new hyperparameters of a model."""
+    if not saved:
+        print_step(f"tuned_params.json: {name} kept (new {new_val_acc:.4f} <= saved {old_val_acc:.4f})")
+    elif old_val_acc is None:
+        print_step(f"tuned_params.json: {name} added ({new_val_acc:.4f})")
+    else:
+        print_step(f"tuned_params.json: {name} updated ({old_val_acc:.4f} -> {new_val_acc:.4f})")
+
+
 def print_scores(label, train_acc, val_acc, val_std, width=26):
     """Show the scores of one experiment on a single line."""
     print(f"  {label:<{width}} train={train_acc:.4f}  val={val_acc:.4f} +/- {val_std:.4f}", flush=True)

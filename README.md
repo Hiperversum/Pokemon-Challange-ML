@@ -25,11 +25,11 @@ Pokemon-Challange-ML/
 │   │   ├── compare_models.py    k-fold comparison of all base models
 │   │   ├── compare_tuned.py     k-fold comparison of tuned models and ensembles
 │   │   ├── feature_ablation.py  contribution of each feature group
-│   │   └── optuna_model.py      Optuna search for one model
+│   │   └── tune_model.py        Optuna search of the hyperparameters of one model
 │   ├── experiments/
-│   │   ├── pca_experiment.py              PCA on all features or on the bags only
-│   │   ├── polynomial_experiment.py       polynomial features for logistic regression
-│   │   └── gradient_descent_experiment.py our gradient descent logistic regression
+│   │   ├── pca.py               PCA on all features or on the bags only
+│   │   ├── polynomial.py        polynomial features for logistic regression
+│   │   └── gradient_descent.py  our gradient descent logistic regression
 │   └── submission/
 │       └── make_submission.py   fit on full train set and write a submission
 └── src/
@@ -95,16 +95,16 @@ python main.py
 ```json5
 run: {
     command: "submit",        // what to do (the list of commands is written above it)
-    model: "voting_best",     // one model: submit, optuna, ablation
+    model: "voting_best",     // one model: submit, tune, ablation
     models: [],               // several models: compare, compare-tuned, pca ([] = all)
-    trials: 50,               // optuna trials
+    trials: 50,               // Optuna trials of tune
 },
 ```
 
 Each command reads only the values it needs. The names of all the models are listed
 in the same file, section "MODEL NAMES".
 
-Commands: `compare`, `compare-tuned`, `ablation`, `optuna`, `pca`, `polynomial`,
+Commands: `compare`, `compare-tuned`, `ablation`, `tune`, `pca`, `polynomial`,
 `gradient-descent`, `submit`. The same file also holds the data folder, file names,
 seed and number of folds. Everything starts from `main.py`: each script reads the values it needs (model,
 models, trials) from this file.

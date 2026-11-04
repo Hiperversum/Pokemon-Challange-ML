@@ -14,10 +14,19 @@ from src.models.catalog import build_model
 from src.features.load_dataset import load_dataset
 from src.utility.print.messages import print_saved
 
+
+####################################################################################
+# SETTINGS: learning rates, regularizations and epochs to try
+####################################################################################
+
 LEARNING_RATES = [0.001, 0.01, 0.1, 1.0]
 L2_VALUES = [0.0, 0.01, 0.1]
 EPOCHS = 300
 
+
+####################################################################################
+# COST HISTORY: how the cost goes down while the model learns
+####################################################################################
 
 def cost_histories(X, y):
     """Fit the GD model with different settings and return the cost every 10 epochs, one column each."""
@@ -34,8 +43,17 @@ def cost_histories(X, y):
     return table
 
 
+####################################################################################
+# EXPERIMENT
+####################################################################################
+
 def main():
     """Save the cost histories and compare the models with k-fold."""
+
+    #---------------------------
+    # FEATURES AND COST HISTORY
+    #---------------------------
+
     X, y, _ = load_dataset()
     X, y = X.values, y.values
     out_dir = get_output_dir("gradient_descent")
@@ -43,9 +61,17 @@ def main():
     cost_histories(X, y).to_csv(cost_path, index=False)
     print_saved(cost_path)
 
+    #---------------------------
+    # MODELS: sklearn's logistic regression and ours with three L2 values
+    #---------------------------
+
     models = {"sklearn logreg C=0.01": build_model("logreg", C=0.01)}
     for l2 in L2_VALUES:
         models[f"gd_logreg l2={l2}"] = build_model("gd_logreg", learning_rate=0.1, n_epochs=EPOCHS, l2=l2)
+
+    #---------------------------
+    # CROSS-VALIDATION OF EVERY MODEL
+    #---------------------------
 
     rows = []
     for name, model in models.items():
@@ -54,7 +80,12 @@ def main():
                      "val_acc": result["val_acc"], "val_std": result["val_std"]})
         print(f"{name:<24} train={result['train_acc']:.4f}  "
               f"val={result['val_acc']:.4f} +/- {result['val_std']:.4f}", flush=True)
-    out_path = out_dir / "gradient_descent_experiment.csv"
+
+    #---------------------------
+    # SAVE THE TABLE
+    #---------------------------
+
+    out_path = out_dir / "gradient_descent.csv"
     pd.DataFrame(rows).to_csv(out_path, index=False)
     print_saved(out_path)
 
