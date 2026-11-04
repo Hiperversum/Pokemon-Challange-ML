@@ -1,5 +1,7 @@
-# Competition data (downloaded from Kaggle, not redistributed)
-/data/
+# Competition data (downloaded from Kaggle, not redistributed); data/models/ holds our tuned
+# hyperparameters and is saved in the repository
+/data/*
+!/data/models/
 
 # Generated files
 /outputs/

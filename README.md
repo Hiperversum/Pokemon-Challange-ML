@@ -16,6 +16,8 @@ Pokemon-Challange-ML/
 ├── main.py                    entry point: python main.py (runs what config.json5 says)
 ├── config.json5               settings: what to run, commands, dataset, output, validation
 ├── data/                      competition files (not versioned, see below)
+│   └── models/
+│       └── tuned_params.json  best hyperparameters found by Optuna (versioned)
 ├── notebooks/
 │   └── kaggle_submission.ipynb  notebook run on Kaggle (clones this repo)
 ├── scripts/
@@ -23,7 +25,6 @@ Pokemon-Challange-ML/
 │   │   ├── compare_models.py    k-fold comparison of all base models
 │   │   ├── compare_tuned.py     k-fold comparison of tuned models and ensembles
 │   │   ├── feature_ablation.py  contribution of each feature group
-│   │   ├── tune_model.py        GridSearchCV for one model
 │   │   └── optuna_model.py      Optuna search for one model
 │   ├── experiments/
 │   │   ├── pca_experiment.py              PCA on all features or on the bags only
@@ -52,7 +53,7 @@ Pokemon-Challange-ML/
     │   └── submission.py      fit on the train set, predict the test, write the csv
     ├── evaluation/
     │   ├── validation.py      stratified k-fold cross-validation
-    │   └── tuning.py          hyperparameter grids
+    │   └── tuning.py          Optuna search spaces and search
     └── utility/
         ├── config/
         │   ├── config_loader.py     read config.json5 into a dictionary
@@ -61,6 +62,8 @@ Pokemon-Challange-ML/
         │   └── config_run.py        start the command; model, models, trials for the scripts
         ├── data/
         │   └── data_loader.py     read jsonl and csv files
+        ├── model/
+        │   └── load_params.py     read and update data/models/tuned_params.json
         └── print/
             └── messages.py        messages shown on the terminal
 ```
@@ -92,7 +95,7 @@ python main.py
 ```json5
 run: {
     command: "submit",        // what to do (the list of commands is written above it)
-    model: "voting_best",     // one model: submit, tune, optuna, ablation
+    model: "voting_best",     // one model: submit, optuna, ablation
     models: [],               // several models: compare, compare-tuned, pca ([] = all)
     trials: 50,               // optuna trials
 },
@@ -101,7 +104,7 @@ run: {
 Each command reads only the values it needs. The names of all the models are listed
 in the same file, section "MODEL NAMES".
 
-Commands: `compare`, `compare-tuned`, `ablation`, `tune`, `optuna`, `pca`, `polynomial`,
+Commands: `compare`, `compare-tuned`, `ablation`, `optuna`, `pca`, `polynomial`,
 `gradient-descent`, `submit`. The same file also holds the data folder, file names,
 seed and number of folds. Everything starts from `main.py`: each script reads the values it needs (model,
 models, trials) from this file.
