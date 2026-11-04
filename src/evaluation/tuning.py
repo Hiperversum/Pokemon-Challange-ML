@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 
 from ..utility.config.config_constants import N_FOLDS, RANDOM_STATE
-from ..models.catalog import build_model
+from ..models.core.model_builder import build_model
 from ..utility.print.messages import print_info, print_trial, timed_step
 from .validation import make_folds
 

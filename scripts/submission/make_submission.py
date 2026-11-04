@@ -4,8 +4,7 @@ Started by main.py with command: "submit" in config.json5 (reads run.model).
 """
 
 from src.utility.config.config_run import run_model
-from src.models.catalog import MODEL_FACTORIES
-from src.models.presets import ENSEMBLES, build_ensemble, build_tuned_model
+from src.models.core.model_builder import ENSEMBLES, MODEL_FACTORIES, build_ensemble, build_tuned_model
 from src.features.load_dataset import load_dataset
 from src.models.submission import fit_and_predict, make_submission, matches_sample_submission
 from src.utility.print.messages import print_info, print_saved, print_step, timed_step

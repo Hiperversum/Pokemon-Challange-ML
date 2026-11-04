@@ -46,7 +46,8 @@
     //   xgboost                 XGBoost
     //   catboost                CatBoost
     //
-    // Ensembles, several tuned models together (only for compare-tuned and submit):
+    // Ensembles, several tuned models together (only for compare-tuned and submit),
+    // defined in data/models/ensembles.json:
     //   voting         average of logreg, gradient_boosting, hist_gradient_boosting
     //   voting_all     average of logreg, gradient_boosting, hist_gradient_boosting, gd_logreg, random_forest
     //   stacking       logreg, gradient_boosting, hist_gradient_boosting, random_forest

@@ -12,14 +12,29 @@ otherwise each step uses a random mini-batch (mini-batch GD).
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
+from ...utility.config.config_constants import RANDOM_STATE
+from ..core.preprocessing import scaled
+
+
+####################################################################################
+# SIGMOID
+####################################################################################
 
 def sigmoid(z):
     """Map any real number to a probability between 0 and 1."""
     return 1.0 / (1.0 + np.exp(-np.clip(z, -30, 30)))
 
 
+####################################################################################
+# THE MODEL
+####################################################################################
+
 class GradientDescentLogisticRegression(ClassifierMixin, BaseEstimator):
     """Binary logistic regression fitted with batch or mini-batch gradient descent."""
+
+    #---------------------------
+    # CREATE: keep the settings
+    #---------------------------
 
     def __init__(self, learning_rate=0.1, n_epochs=300, batch_size=None, l2=0.0, random_state=0):
         self.learning_rate = learning_rate
@@ -27,6 +42,10 @@ class GradientDescentLogisticRegression(ClassifierMixin, BaseEstimator):
         self.batch_size = batch_size
         self.l2 = l2
         self.random_state = random_state
+
+    #---------------------------
+    # COST AND GRADIENT
+    #---------------------------
 
     def _add_bias(self, X):
         """Add a column of ones so the first weight works as the intercept."""
@@ -44,6 +63,10 @@ class GradientDescentLogisticRegression(ClassifierMixin, BaseEstimator):
         grad = Xb.T @ (sigmoid(Xb @ beta) - y) / len(y)
         grad[1:] += self.l2 * beta[1:]
         return grad
+
+    #---------------------------
+    # FIT: gradient descent
+    #---------------------------
 
     def fit(self, X, y):
         """Run gradient descent and store the weights and the cost of every epoch."""
@@ -66,6 +89,10 @@ class GradientDescentLogisticRegression(ClassifierMixin, BaseEstimator):
         self.coef_ = beta[1:]
         return self
 
+    #---------------------------
+    # PREDICT
+    #---------------------------
+
     def predict_proba(self, X):
         """Return the probabilities of class 0 and class 1."""
         p = sigmoid(self._add_bias(X) @ np.concatenate([[self.intercept_], self.coef_]))
@@ -74,3 +101,15 @@ class GradientDescentLogisticRegression(ClassifierMixin, BaseEstimator):
     def predict(self, X):
         """Predict 1 when the probability of a Player 1 win is at least 0.5."""
         return (self.predict_proba(X)[:, 1] >= 0.5).astype(int)
+
+
+####################################################################################
+# BUILD IT (used by the catalog)
+####################################################################################
+
+def gd_logistic_regression(learning_rate=0.1, n_epochs=300, batch_size=None, l2=0.01):
+    """Logistic regression trained with our gradient descent on standardized features."""
+    return scaled(GradientDescentLogisticRegression(
+        learning_rate=learning_rate, n_epochs=n_epochs, batch_size=batch_size, l2=l2,
+        random_state=RANDOM_STATE,
+    ))

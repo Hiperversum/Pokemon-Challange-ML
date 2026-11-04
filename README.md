@@ -17,7 +17,8 @@ Pokemon-Challange-ML/
 ├── config.json5               settings: what to run, commands, dataset, output, validation
 ├── data/                      competition files (not versioned, see below)
 │   └── models/
-│       └── tuned_params.json  best hyperparameters found by Optuna (versioned)
+│       ├── tuned_params.json  best hyperparameters found by Optuna (versioned)
+│       └── ensembles.json     type and members of each ensemble (versioned)
 ├── notebooks/
 │   └── kaggle_submission.ipynb  notebook run on Kaggle (clones this repo)
 ├── scripts/
@@ -46,10 +47,13 @@ Pokemon-Challange-ML/
     │       ├── timeline.py    state of the battle after 30 turns
     │       └── bags.py        species and moves counts (bag of tokens)
     ├── models/
-    │   ├── catalog.py         logistic regression, kNN, tree, RF, boosting, XGBoost, CatBoost
-    │   ├── gradient_descent.py logistic regression trained with gradient descent
-    │   ├── ensemble.py        voting and stacking
-    │   ├── presets.py         tuned models and ensembles used for the submissions
+    │   ├── core/
+    │   │   ├── model_builder.py   catalog of the models, build_model, tuned models and ensembles
+    │   │   └── preprocessing.py   StandardScaler (and PCA) in front of a model
+    │   ├── classifiers/       one file per model: logistic_regression, gd_logistic_regression
+    │   │                      (our gradient descent), knn, decision_tree, random_forest, adaboost,
+    │   │                      gradient_boosting, hist_gradient_boosting, xgboost, catboost,
+    │   │                      ensemble (voting and stacking)
     │   └── submission.py      fit on the train set, predict the test, write the csv
     ├── evaluation/
     │   ├── validation.py      stratified k-fold cross-validation

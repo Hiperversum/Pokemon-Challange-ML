@@ -7,7 +7,7 @@ from src.utility.config.config_constants import N_FOLDS
 from src.utility.config.config_paths import get_output_dir
 from src.utility.config.config_run import run_models
 from src.evaluation.validation import compare_models
-from src.models.presets import (
+from src.models.core.model_builder import (
     ENSEMBLES, TUNED_MODELS, build_ensemble, build_tuned_model,
 )
 from src.features.load_dataset import load_dataset
@@ -28,7 +28,7 @@ def main():
     # The models written in config.json5 ([] = all the tuned models and all the ensembles)
     names = run_models(list(TUNED_MODELS) + list(ENSEMBLES))
     X, y, _ = load_dataset()
-    # Ensembles from presets.py, single models with the hyperparameters of tuned_params.json
+    # Ensembles from ensembles.json, single models with the hyperparameters of tuned_params.json
     models = {name: build_ensemble(name) if name in ENSEMBLES else build_tuned_model(name)
               for name in names}
 

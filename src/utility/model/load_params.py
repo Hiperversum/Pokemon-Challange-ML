@@ -1,7 +1,10 @@
-"""Read and write tuned_params.json: the best hyperparameters found by Optuna for each model.
+"""Read the json files of data/models: the tuned hyperparameters and the ensembles.
 
-The file lives in data/models/ and is saved in the repository (unlike the competition files
-in data/), so the Kaggle notebook that clones the repository uses the same tuned models.
+- tuned_params.json: the best hyperparameters found by Optuna for each model (the tune command updates it);
+- ensembles.json: the type (voting or stacking) and the members of each ensemble.
+
+The files live in data/models/ and are saved in the repository (unlike the competition files
+in data/), so the Kaggle notebook that clones the repository uses the same models.
 """
 
 import json
@@ -10,10 +13,11 @@ from ..config.config_loader import PROJECT_ROOT
 
 
 ####################################################################################
-# FILE
+# FILES
 ####################################################################################
 
 PARAMS_FILE = PROJECT_ROOT / "data" / "models" / "tuned_params.json"
+ENSEMBLES_FILE = PROJECT_ROOT / "data" / "models" / "ensembles.json"
 
 
 ####################################################################################
@@ -29,8 +33,14 @@ def load_params():
 
 
 def load_tuned_models():
-    """Return {model: hyperparameters}, the form used by presets.py."""
+    """Return {model: hyperparameters}, the form used by model_builder.py."""
     return {name: entry["params"] for name, entry in load_params().items()}
+
+
+def load_ensembles():
+    """Return {ensemble: {"type": "voting" or "stacking", "models": [names of the members]}}."""
+    with open(ENSEMBLES_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 ####################################################################################

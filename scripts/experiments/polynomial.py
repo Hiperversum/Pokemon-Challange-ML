@@ -10,8 +10,8 @@ import pandas as pd
 
 from src.utility.config.config_paths import get_output_dir
 from src.evaluation.validation import cross_validate
-from src.models.catalog import build_model
-from src.models.catalog import polynomial_logistic_regression
+from src.models.core.model_builder import build_model
+from src.models.classifiers.logistic_regression import polynomial_logistic_regression
 from src.features.load_dataset import load_dataset
 from src.utility.print.messages import print_saved
 

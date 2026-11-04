@@ -9,8 +9,7 @@ from src.utility.config.config_paths import get_output_dir
 from src.utility.config.config_run import run_model
 from src.evaluation.validation import cross_validate
 from src.features.core.feature_builder import FeatureBuilder
-from src.models.catalog import MODEL_FACTORIES
-from src.models.presets import build_tuned_model
+from src.models.core.model_builder import MODEL_FACTORIES, build_tuned_model
 from src.features.load_dataset import load_dataset
 from src.utility.print.messages import print_saved, print_scores, print_section, print_step, print_table
 

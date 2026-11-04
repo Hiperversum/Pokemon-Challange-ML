@@ -1,0 +1,22 @@
+{
+    "voting": {
+        "type": "voting",
+        "models": ["logreg", "gradient_boosting", "hist_gradient_boosting"]
+    },
+    "voting_all": {
+        "type": "voting",
+        "models": ["logreg", "gradient_boosting", "hist_gradient_boosting", "gd_logreg", "random_forest"]
+    },
+    "stacking": {
+        "type": "stacking",
+        "models": ["logreg", "gradient_boosting", "hist_gradient_boosting", "random_forest"]
+    },
+    "voting_best": {
+        "type": "voting",
+        "models": ["logreg", "catboost", "xgboost", "gradient_boosting", "hist_gradient_boosting"]
+    },
+    "stacking_best": {
+        "type": "stacking",
+        "models": ["logreg", "catboost", "xgboost", "gradient_boosting", "hist_gradient_boosting"]
+    }
+}

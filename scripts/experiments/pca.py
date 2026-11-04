@@ -16,8 +16,8 @@ from src.utility.config.config_constants import RANDOM_STATE
 from src.utility.config.config_paths import get_output_dir
 from src.utility.config.config_run import run_models
 from src.evaluation.validation import cross_validate
-from src.models.catalog import MODEL_FACTORIES, build_model
-from src.models.catalog import pca_on_columns, scaled
+from src.models.core.model_builder import MODEL_FACTORIES, build_model
+from src.models.core.preprocessing import pca_on_columns, scaled
 from src.features.load_dataset import load_dataset
 from src.utility.print.messages import print_saved
 
