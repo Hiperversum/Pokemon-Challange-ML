@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from ... import config
+from ...utility.config.config_constants import ID_COLUMN, TARGET
 from ..groups.bags import BagOfTokens
 from ..groups.matchup import matchup_features
 from ..groups.lead import lead_features
@@ -74,11 +74,11 @@ class FeatureBuilder:
         rows = []
         for battle in battles:
             feats = self.battle_features(battle)
-            feats[config.ID_COLUMN] = battle[config.ID_COLUMN]
+            feats[ID_COLUMN] = battle[ID_COLUMN]
             rows.append(feats)
 
         # The list of dictionaries becomes a table: one row per battle, one column per feature
-        return pd.DataFrame(rows).set_index(config.ID_COLUMN).fillna(0.0)
+        return pd.DataFrame(rows).set_index(ID_COLUMN).fillna(0.0)
 
 
 ####################################################################################
@@ -88,7 +88,7 @@ class FeatureBuilder:
 def extract_target(battles):
     """Return the player_won labels as a Series indexed by battle_id."""
     return pd.Series(
-        [int(b[config.TARGET]) for b in battles],
-        index=[b[config.ID_COLUMN] for b in battles],
-        name=config.TARGET,
+        [int(b[TARGET]) for b in battles],
+        index=[b[ID_COLUMN] for b in battles],
+        name=TARGET,
     )

@@ -5,7 +5,7 @@ species they contain. Collecting them gives a small Pokedex that lets us
 describe the Player 2 Pokemon revealed during the timeline.
 """
 
-from ... import config
+from ...utility.config.config_constants import STATS
 
 
 ####################################################################################
@@ -23,7 +23,7 @@ def clean_types(types):
 
 def base_total(pokemon):
     """Return the sum of the six base stats of a Pokemon."""
-    return sum(pokemon[f"base_{s}"] for s in config.STATS)
+    return sum(pokemon[f"base_{s}"] for s in STATS)
 
 
 ####################################################################################
@@ -67,7 +67,7 @@ class Pokedex:
             return
 
         # The entry of the species: its 6 base stats and its types
-        entry = {f"base_{s}": pokemon[f"base_{s}"] for s in config.STATS}
+        entry = {f"base_{s}": pokemon[f"base_{s}"] for s in STATS}
         entry["types"] = clean_types(pokemon["types"])
         self._entries[name] = entry
 

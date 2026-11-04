@@ -4,7 +4,8 @@ import json
 
 import pandas as pd # type: ignore
 
-from ... import config
+from ..config.config_constants import SAMPLE_SUBMISSION_FILE, TEST_FILE, TRAIN_FILE, TYPE_CHART_FILE
+from ..config.config_paths import get_data_dir
 
 
 ####################################################################################
@@ -24,8 +25,8 @@ def load_jsonl(path):
 
 def load_battles(split, data_dir=None):
     """Load the battles of the given split ("train" or "test")."""
-    data_dir = data_dir or config.get_data_dir()
-    file_name = {"train": config.TRAIN_FILE, "test": config.TEST_FILE}[split]
+    data_dir = data_dir or get_data_dir()
+    file_name = {"train": TRAIN_FILE, "test": TEST_FILE}[split]
     return load_jsonl(data_dir / file_name)
 
 
@@ -35,11 +36,11 @@ def load_battles(split, data_dir=None):
 
 def load_type_chart(data_dir=None):
     """Load the Gen 2 type chart as a DataFrame (attacking_type, defending_type, multiplier)."""
-    data_dir = data_dir or config.get_data_dir()
-    return pd.read_csv(data_dir / config.TYPE_CHART_FILE)
+    data_dir = data_dir or get_data_dir()
+    return pd.read_csv(data_dir / TYPE_CHART_FILE)
 
 
 def load_sample_submission(data_dir=None):
     """Load the sample submission file provided by the competition."""
-    data_dir = data_dir or config.get_data_dir()
-    return pd.read_csv(data_dir / config.SAMPLE_SUBMISSION_FILE)
+    data_dir = data_dir or get_data_dir()
+    return pd.read_csv(data_dir / SAMPLE_SUBMISSION_FILE)

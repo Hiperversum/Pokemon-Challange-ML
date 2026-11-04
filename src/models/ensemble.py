@@ -4,7 +4,7 @@ from sklearn.ensemble import StackingClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 
-from .. import config
+from ..utility.config.config_constants import N_FOLDS, RANDOM_STATE
 from .catalog import build_model
 
 
@@ -20,7 +20,7 @@ def voting_ensemble(model_specs, voting="soft"):
 
 def stacking_ensemble(model_specs, final_C=1.0):
     """Train a logistic regression on the out-of-fold predictions of several models."""
-    cv = StratifiedKFold(n_splits=config.N_FOLDS, shuffle=True, random_state=config.RANDOM_STATE)
+    cv = StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=RANDOM_STATE)
     return StackingClassifier(
         estimators=_named_models(model_specs),
         final_estimator=LogisticRegression(C=final_C, max_iter=5000),

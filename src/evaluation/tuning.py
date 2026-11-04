@@ -4,7 +4,7 @@ import optuna
 import pandas as pd
 from sklearn.model_selection import GridSearchCV, ParameterGrid, cross_val_score
 
-from .. import config
+from ..utility.config.config_constants import N_FOLDS, RANDOM_STATE
 from ..models.catalog import build_model
 from ..utility.print.messages import print_info, print_trial, timed_step
 from .validation import make_folds
@@ -36,7 +36,7 @@ PARAM_GRIDS = {
 }
 
 
-def grid_search(name, X, y, param_grid=None, n_folds=config.N_FOLDS):
+def grid_search(name, X, y, param_grid=None, n_folds=N_FOLDS):
     """Run GridSearchCV on one model and return (best params, results table)."""
     param_grid = param_grid or PARAM_GRIDS[name]
     n_combinations = len(ParameterGrid(param_grid))
@@ -95,7 +95,7 @@ OPTUNA_SPACES = {
 }
 
 
-def optuna_search(name, X, y, n_trials=50, n_folds=config.N_FOLDS):
+def optuna_search(name, X, y, n_trials=50, n_folds=N_FOLDS):
     """Search the hyperparameters of one model with Optuna and return (best params, trials table).
 
     Every trial is scored with the same stratified k-fold used everywhere in the project.
@@ -113,7 +113,7 @@ def optuna_search(name, X, y, n_trials=50, n_folds=config.N_FOLDS):
 
     print_info("trials", f"{n_trials} x {n_folds} folds = {n_trials * n_folds} fits")
     study = optuna.create_study(
-        direction="maximize", sampler=optuna.samplers.TPESampler(seed=config.RANDOM_STATE)
+        direction="maximize", sampler=optuna.samplers.TPESampler(seed=RANDOM_STATE)
     )
     with timed_step(f"Optuna search for {name}"):
         study.optimize(objective, n_trials=n_trials, callbacks=[report])

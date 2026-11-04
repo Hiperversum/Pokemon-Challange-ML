@@ -3,21 +3,16 @@
 1. Cost history table for several learning rates (batch GD) and for mini-batch GD.
 2. Stratified k-fold accuracy of the GD model compared with sklearn's LogisticRegression.
 
-Usage: python scripts/experiments/gradient_descent_experiment.py
+Started by main.py with command: "gradient-descent" in config.json5.
 """
-
-import sys
-from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.validation import cross_validate  # noqa: E402
-from src.models.catalog import build_model  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_saved  # noqa: E402
+from src.utility.config.config_paths import get_output_dir
+from src.evaluation.validation import cross_validate
+from src.models.catalog import build_model
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import print_saved
 
 LEARNING_RATES = [0.001, 0.01, 0.1, 1.0]
 L2_VALUES = [0.0, 0.01, 0.1]
@@ -43,7 +38,7 @@ def main():
     """Save the cost histories and compare the models with k-fold."""
     X, y, _ = load_dataset()
     X, y = X.values, y.values
-    out_dir = config.get_output_dir()
+    out_dir = get_output_dir()
     cost_path = out_dir / "gd_cost_history.csv"
     cost_histories(X, y).to_csv(cost_path, index=False)
     print_saved(cost_path)

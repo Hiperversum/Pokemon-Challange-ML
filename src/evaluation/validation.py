@@ -8,16 +8,16 @@ from sklearn.base import clone
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
 
-from .. import config
+from ..utility.config.config_constants import N_FOLDS, RANDOM_STATE
 from ..utility.print.messages import print_fold_done, print_model_result, print_model_start
 
 
-def make_folds(n_folds=config.N_FOLDS, seed=config.RANDOM_STATE):
+def make_folds(n_folds=N_FOLDS, seed=RANDOM_STATE):
     """Return the shuffled stratified splitter used everywhere in the project."""
     return StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
 
 
-def cross_validate(model, X, y, n_folds=config.N_FOLDS, seed=config.RANDOM_STATE, on_fold=None):
+def cross_validate(model, X, y, n_folds=N_FOLDS, seed=RANDOM_STATE, on_fold=None):
     """Fit the model on each fold and return train/validation accuracies.
 
     If given, on_fold(score) is called after each fold with its validation accuracy.
@@ -42,7 +42,7 @@ def cross_validate(model, X, y, n_folds=config.N_FOLDS, seed=config.RANDOM_STATE
     }
 
 
-def compare_models(models, X, y, n_folds=config.N_FOLDS, verbose=True):
+def compare_models(models, X, y, n_folds=N_FOLDS, verbose=True):
     """Cross-validate several models and return a table sorted by validation accuracy."""
     rows = []
     for position, (name, model) in enumerate(models.items(), start=1):

@@ -4,41 +4,30 @@ Two variants are compared with the models without PCA:
 - PCA on all the features;
 - PCA only on the bag-of-tokens columns (species and moves counts).
 
-Usage: python scripts/experiments/pca_experiment.py [--models logreg knn ...]
+Started by main.py with command: "pca" in config.json5 (reads run.models).
 """
-
-import argparse
-import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.validation import cross_validate  # noqa: E402
-from src.models.catalog import build_model  # noqa: E402
-from src.models.catalog import pca_on_columns, scaled  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_saved  # noqa: E402
+from src.utility.config.config_constants import RANDOM_STATE
+from src.utility.config.config_paths import get_output_dir
+from src.utility.config.config_run import run_models
+from src.evaluation.validation import cross_validate
+from src.models.catalog import MODEL_FACTORIES, build_model
+from src.models.catalog import pca_on_columns, scaled
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import print_saved
 
 ALL_COMPONENTS = [5, 10, 20, 50, 100, 200]
 BAG_COMPONENTS = [5, 10, 20, 50]
 
 
-def parse_args():
-    """Read the command line options."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models", nargs="+", default=["logreg", "knn", "hist_gradient_boosting"])
-    return parser.parse_args()
-
-
 def explained_variance_summary(X):
     """Print how many components keep 80%, 90%, 95% and 99% of the variance."""
-    pca = PCA(random_state=config.RANDOM_STATE).fit(StandardScaler().fit_transform(X))
+    pca = PCA(random_state=RANDOM_STATE).fit(StandardScaler().fit_transform(X))
     cumulative = np.cumsum(pca.explained_variance_ratio_)
     for share in (0.80, 0.90, 0.95, 0.99):
         n = int(np.searchsorted(cumulative, share) + 1)
@@ -63,14 +52,14 @@ def model_variants(name, bag_columns):
 
 def main():
     """Build the features, run every variant and save the comparison table."""
-    args = parse_args()
+    names = run_models(["logreg", "knn", "hist_gradient_boosting"], allowed=MODEL_FACTORIES)
     X, y, _ = load_dataset()
     bag_columns = [i for i, col in enumerate(X.columns) if col.startswith("bag_")]
     print(f"Features: {X.shape[1]} ({len(bag_columns)} bag columns)  Train battles: {X.shape[0]}")
     explained_variance_summary(X.values)
 
     rows = []
-    for name in args.models:
+    for name in names:
         for variant, n, model in model_variants(name, bag_columns):
             result = cross_validate(model, X.values, y.values)
             rows.append({"model": name, "variant": variant, "n_components": n,
@@ -80,7 +69,7 @@ def main():
                   f"val={result['val_acc']:.4f} +/- {result['val_std']:.4f}", flush=True)
 
     table = pd.DataFrame(rows)
-    out_path = config.get_output_dir() / "pca_experiment.csv"
+    out_path = get_output_dir() / "pca_experiment.csv"
     table.to_csv(out_path, index=False)
     print_saved(out_path)
 

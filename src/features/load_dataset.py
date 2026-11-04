@@ -1,6 +1,6 @@
 """From the competition files to the tables of features used by the models."""
 
-from ..utility.loader.data_loader import load_battles, load_type_chart
+from ..utility.data.data_loader import load_battles, load_type_chart
 from ..utility.print.messages import print_info, timed_step
 from .core.feature_builder import FeatureBuilder, extract_target
 from .core.pokedex import Pokedex

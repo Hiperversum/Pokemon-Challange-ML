@@ -3,22 +3,17 @@
 Squares and pairwise products of the Player 1 minus Player 2 differences are added,
 so a linear model can learn curved decision boundaries.
 
-Usage: python scripts/experiments/polynomial_experiment.py
+Started by main.py with command: "polynomial" in config.json5.
 """
-
-import sys
-from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.validation import cross_validate  # noqa: E402
-from src.models.catalog import build_model  # noqa: E402
-from src.models.catalog import polynomial_logistic_regression  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_saved  # noqa: E402
+from src.utility.config.config_paths import get_output_dir
+from src.evaluation.validation import cross_validate
+from src.models.catalog import build_model
+from src.models.catalog import polynomial_logistic_regression
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import print_saved
 
 CORE_DIFFS = ["hp_remaining_diff", "fainted_diff", "strength_left_diff",
               "hp_lost_diff", "statused_diff", "alive_hp_mean_diff"]
@@ -45,7 +40,7 @@ def main():
                      "val_acc": result["val_acc"], "val_std": result["val_std"]})
         print(f"{name:<26} train={result['train_acc']:.4f}  "
               f"val={result['val_acc']:.4f} +/- {result['val_std']:.4f}", flush=True)
-    out_path = config.get_output_dir() / "polynomial_experiment.csv"
+    out_path = get_output_dir() / "polynomial_experiment.csv"
     pd.DataFrame(rows).to_csv(out_path, index=False)
     print_saved(out_path)
 

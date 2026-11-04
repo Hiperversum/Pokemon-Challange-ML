@@ -32,7 +32,6 @@ Pokemon-Challange-ML/
 │   └── submission/
 │       └── make_submission.py   fit on full train set and write a submission
 └── src/
-    ├── config.py              reads config.json5 and gives paths and constants
     ├── features/
     │   ├── load_dataset.py    load_dataset: files -> table of features
     │   ├── core/
@@ -55,9 +54,12 @@ Pokemon-Challange-ML/
     │   ├── validation.py      stratified k-fold cross-validation
     │   └── tuning.py          hyperparameter grids
     └── utility/
-        ├── command.py             the 3 steps of main.py: choose, build arguments, run
-        ├── loader/
-        │   ├── config_loader.py   read config.json5
+        ├── config/
+        │   ├── config_loader.py     read config.json5 into a dictionary
+        │   ├── config_constants.py  values of config.json5 and constants of the game
+        │   ├── config_paths.py      data and output folders
+        │   └── config_run.py        start the command; model, models, trials for the scripts
+        ├── data/
         │   └── data_loader.py     read jsonl and csv files
         └── print/
             └── messages.py        messages shown on the terminal
@@ -101,8 +103,8 @@ in the same file, section "MODEL NAMES".
 
 Commands: `compare`, `compare-tuned`, `ablation`, `tune`, `optuna`, `pca`, `polynomial`,
 `gradient-descent`, `submit`. The same file also holds the data folder, file names,
-seed and number of folds. Every script in `scripts/` can still be started alone
-(for example `python scripts/evaluation/tune_model.py --model logreg`).
+seed and number of folds. Everything starts from `main.py`: each script reads the values it needs (model,
+models, trials) from this file.
 
 ## Method overview
 

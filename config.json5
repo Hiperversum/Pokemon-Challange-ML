@@ -61,17 +61,17 @@
     ////////////////////////////////////////
     // COMMANDS
     ////////////////////////////////////////
-    // The script of each command and the values of "run" it reads. No need to change this part.
+    // The script that runs each command. No need to change this part.
     commands: {
-        "compare":          { script: "scripts/evaluation/compare_models.py", reads: ["models"] },
-        "compare-tuned":    { script: "scripts/evaluation/compare_tuned.py", reads: ["models"] },
-        "submit":           { script: "scripts/submission/make_submission.py", reads: ["model"] },
-        "tune":             { script: "scripts/evaluation/tune_model.py", reads: ["model"] },
-        "optuna":           { script: "scripts/evaluation/optuna_model.py", reads: ["model", "trials"] },
-        "ablation":         { script: "scripts/evaluation/feature_ablation.py", reads: ["model"] },
-        "pca":              { script: "scripts/experiments/pca_experiment.py", reads: ["models"] },
-        "polynomial":       { script: "scripts/experiments/polynomial_experiment.py", reads: [] },
-        "gradient-descent": { script: "scripts/experiments/gradient_descent_experiment.py", reads: [] },
+        "compare":          "scripts/evaluation/compare_models.py",
+        "compare-tuned":    "scripts/evaluation/compare_tuned.py",
+        "submit":           "scripts/submission/make_submission.py",
+        "tune":             "scripts/evaluation/tune_model.py",
+        "optuna":           "scripts/evaluation/optuna_model.py",
+        "ablation":         "scripts/evaluation/feature_ablation.py",
+        "pca":              "scripts/experiments/pca_experiment.py",
+        "polynomial":       "scripts/experiments/polynomial_experiment.py",
+        "gradient-descent": "scripts/experiments/gradient_descent_experiment.py",
     },
 
     ////////////////////////////////////////

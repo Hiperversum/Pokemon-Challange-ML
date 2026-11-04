@@ -6,7 +6,8 @@
 import time
 from contextlib import contextmanager
 
-from ... import config
+from ..config.config_constants import N_FOLDS, RANDOM_STATE
+from ..config.config_paths import get_data_dir, get_output_root
 
 LINE_WIDTH = 72
 
@@ -70,22 +71,28 @@ def timed_step(text):
 # COMMANDS
 ####################################################################################
 
-def print_run_header(command, script, arguments):
+def print_run_header(command, script):
     """Show which command is going to run and with which settings."""
-    print_title(f"python main.py: {command} {' '.join(arguments)}".rstrip())
+    print_title(f"python main.py: {command}")
     print_info("script", script)
-    print_info("data folder", config.get_data_dir())
-    print_info("output folder", config.get_output_root())
-    print_info("seed / folds", f"{config.RANDOM_STATE} / {config.N_FOLDS}")
+    print_info("data folder", get_data_dir())
+    print_info("output folder", get_output_root())
+    print_info("seed / folds", f"{RANDOM_STATE} / {N_FOLDS}")
 
 
 def print_commands(commands, chosen):
     """List the available commands and say which one is chosen in config.json5."""
     print("Available commands:")
-    for name, entry in commands.items():
-        print(f"  {name:<18} {entry['script']}")
+    for name, script in commands.items():
+        print(f"  {name:<18} {script}")
     print()
     print(f"Chosen in config.json5: {chosen}", flush=True)
+
+
+def print_wrong_value(value, allowed):
+    """Say that a model written in config.json5 cannot be used by this command, and list the valid ones."""
+    print(f'"{value}" cannot be used by this command.')
+    print(f"Valid names: {', '.join(allowed)}", flush=True)
 
 
 ####################################################################################
