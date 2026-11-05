@@ -72,6 +72,39 @@ def replay(battle):
 
 
 ####################################################################################
+# EXITS: how each benched Pokemon left the field for the last time (to find hidden KOs)
+####################################################################################
+
+def last_exits(battle, side):
+    """For each benched, not fainted Pokemon of `side`: (last HP, kind of its last exit).
+
+    A Player 2 faint is written almost only when a Player 1 Pokemon faints in the same turn:
+    otherwise the row already shows the replacement and the fainted Pokemon just disappears.
+    Kind of exit: did the opponent attack, was the newcomer hit (more than spikes), was the
+    opponent hit, and how much HP the Pokemon had left (4 levels).
+    """
+    opp, timeline = opponent(side), battle["battle_timeline"]
+    names = [turn[f"{side}_pokemon_state"]["name"] for turn in timeline]
+    exits = {}
+    for name, row in {n: i for i, n in enumerate(names)}.items():
+        state = timeline[row][f"{side}_pokemon_state"]
+        if state["status"] == "fnt" or row == len(timeline) - 1:
+            continue
+        newcomer = timeline[row + 1][f"{side}_pokemon_state"]
+        newcomer_hp = next((t[f"{side}_pokemon_state"]["hp_pct"] for t in reversed(timeline[:row + 1])
+                            if t[f"{side}_pokemon_state"]["name"] == newcomer["name"]), 1.0)
+        old_opp, new_opp = timeline[row][f"{opp}_pokemon_state"], timeline[row + 1][f"{opp}_pokemon_state"]
+        move = timeline[row + 1].get(f"{opp}_move_details")
+        exits[name] = (state["hp_pct"], (
+            bool(move) and move["category"] != "status",
+            newcomer["hp_pct"] < newcomer_hp - 0.13,
+            new_opp["name"] == old_opp["name"] and new_opp["hp_pct"] < old_opp["hp_pct"],
+            min(int(state["hp_pct"] * 4), 3),
+        ))
+    return exits
+
+
+####################################################################################
 # END STATE
 ####################################################################################
 
@@ -86,6 +119,8 @@ class EndState:
         # A species gets its own "HP left" column only if it is seen in this many battles
         self.min_count = min_count
         self.species = []
+        # Share of hidden KOs among the Player 2 exits of each kind (learned in fit)
+        self.hidden_ko_share = {}
 
     #---------------------------
     # FIT: learn the frequent species from the training battles
@@ -100,6 +135,14 @@ class EndState:
             counts.update(names)
         # Alphabetical order, so the columns are always in the same order
         self.species = sorted(n for n, c in counts.items() if c >= self.min_count)
+
+        # Hidden KOs: Player 1 faints are always written, so Player 1 shows how often each kind of
+        # exit happens to an alive Pokemon; the extra Player 2 exits of the same kind are hidden KOs
+        exits = {side: Counter() for side in SIDES}
+        for battle in battles:
+            for side in SIDES:
+                exits[side].update(kind for _, kind in last_exits(battle, side).values())
+        self.hidden_ko_share = {kind: max(0.0, (n - exits["p1"][kind]) / n) for kind, n in exits["p2"].items()}
         return self
 
     #---------------------------
@@ -167,6 +210,15 @@ class EndState:
         ) + unrevealed
         feats["end_p2_hp_adjusted"] = p2_hp_adjusted
         feats["end_hp_adjusted_diff"] = sum(hp["p1"].values()) - p2_hp_adjusted
+
+        # The same with the expected hidden KOs: each benched Player 2 Pokemon counts as its kind of exit
+        hidden = {name: self.hidden_ko_share.get(kind, 0.0) for name, (_, kind) in last_exits(battle, "p2").items()}
+        feats["hidden_ko_estimate"] = sum(hidden.values())
+        feats["ko_diff_estimated"] = (sum(s == "fnt" for s in status["p2"].values()) + feats["hidden_ko_estimate"]
+                                      - sum(s == "fnt" for s in status["p1"].values()))
+        p2_hp_estimated = sum(h * (1 - hidden.get(n, 0.0)) for n, h in hp["p2"].items()
+                              if status["p2"][n] != "fnt") + unrevealed
+        feats["hp_diff_estimated"] = sum(hp["p1"].values()) - p2_hp_estimated
 
         #---------------------------
         # TREND OF THE HP DIFFERENCE DURING THE 30 TURNS
