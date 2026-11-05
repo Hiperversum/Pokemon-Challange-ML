@@ -3,7 +3,7 @@
 The timeline group already gives KOs, HP and statuses at turn 30. This group adds what it misses:
 - how healthy the Pokemon still alive are, and which ones are asleep, frozen or almost KO;
 - the Player 2 Pokemon resting on the bench with low HP: Player 2 faints are recorded much
-  less often than Player 1 faints (0.5 vs 1.7 per battle), and those Pokemon behave like hidden KOs;
+  less often than Player 1 faints, and those Pokemon behave like hidden KOs;
 - how the HP difference changed during the 30 turns (trend, last turns);
 - boosts and effects of the Pokemon on the field, spikes;
 - the HP left of each frequent species (a healthy Snorlax is worth more than another healthy Pokemon).

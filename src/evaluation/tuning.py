@@ -17,7 +17,7 @@ N_REPEATS = 3
 # OPTUNA SPACES:
 ####################################################################################
 
-# For each model: a function that asks Optuna for one value of every hyperparameter.W
+# For each model: a function that asks Optuna for one value of every hyperparameter
 OPTUNA_SPACES = {
     "logreg": lambda trial: {
         "C": trial.suggest_float("C", 1e-4, 1.0, log=True),
@@ -60,7 +60,7 @@ def optuna_search(name, X, y, n_trials=50, n_folds=N_FOLDS):
     # Remove the Optuna messages that are annoying when running many trials
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-    # Function
+    # The objective of the study: the score of one combination of hyperparameters
     def objective(trial):
         """Score one set of hyperparameters with repeated k-fold accuracy."""
         model = build_model(name, **OPTUNA_SPACES[name](trial))

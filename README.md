@@ -97,7 +97,7 @@ python main.py
 ```json5
 run: {
     command: "submit",        // what to do (the list of commands is written above it)
-    model: "voting_best",     // one model: submit, tune, ablation
+    model: "voting",          // one model: submit, tune, ablation
     models: [],               // several models: compare, compare-tuned, pca ([] = all)
     trials: 50,               // Optuna trials of tune
 },
