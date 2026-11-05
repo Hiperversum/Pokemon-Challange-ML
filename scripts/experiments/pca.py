@@ -28,7 +28,7 @@ from src.utility.print.messages import print_saved
 
 # PCA on all the features
 ALL_COMPONENTS = [5, 10, 20, 50, 100, 200]
-# PCA only on the 441 columns of the bags
+# PCA only on the columns of the bags
 BAG_COMPONENTS = [5, 10, 20, 50]
 
 

@@ -1,20 +1,23 @@
-"""Hyperparameter search with Optuna, on the same k-fold splits used everywhere."""
+"""Hyperparameter search with Optuna, scored with stratified k-fold repeated several times."""
 
 import optuna
 import pandas as pd
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import RepeatedStratifiedKFold, cross_val_score
 
 from ..utility.config.config_constants import N_FOLDS, RANDOM_STATE
 from ..models.core.model_builder import build_model
 from ..utility.print.messages import print_info, print_trial, timed_step
-from .validation import make_folds
+
+# Each trial is scored on the k folds drawn N_REPEATS times in different ways: with one fixed
+# split Optuna could choose the values that work well only on those particular folds
+N_REPEATS = 3
 
 
 ####################################################################################
 # OPTUNA SPACES:
 ####################################################################################
 
-# For each model: a function that asks Optuna for one value of every hyperparameter.W
+# For each model: a function that asks Optuna for one value of every hyperparameter
 OPTUNA_SPACES = {
     "logreg": lambda trial: {
         "C": trial.suggest_float("C", 1e-4, 1.0, log=True),
@@ -51,24 +54,27 @@ OPTUNA_SPACES = {
 def optuna_search(name, X, y, n_trials=50, n_folds=N_FOLDS):
     """Search the hyperparameters of one model with Optuna and return (best params, trials table).
 
-    Every trial is scored with the same stratified k-fold used everywhere in the project.
+    Every trial is scored with the stratified k-fold of the project, repeated N_REPEATS times
+    with different folds (RepeatedStratifiedKFold).
     """
     # Remove the Optuna messages that are annoying when running many trials
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 
-    # Function
+    # The objective of the study: the score of one combination of hyperparameters
     def objective(trial):
-        """Score one set of hyperparameters with k-fold accuracy."""
+        """Score one set of hyperparameters with repeated k-fold accuracy."""
         model = build_model(name, **OPTUNA_SPACES[name](trial))
-        # The 5 folds are trained at the same time on different cores (n_jobs=-1)
-        return cross_val_score(model, X, y, cv=make_folds(n_folds), scoring="accuracy", n_jobs=-1).mean()
+        cv = RepeatedStratifiedKFold(n_splits=n_folds, n_repeats=N_REPEATS, random_state=RANDOM_STATE)
+        # The k x N_REPEATS fits are trained at the same time on different cores (n_jobs=-1)
+        return cross_val_score(model, X, y, cv=cv, scoring="accuracy", n_jobs=-1).mean()
 
     def report(study, trial):
         """Print one line after each trial."""
         print_trial(trial.number + 1, n_trials, trial.value, study.best_value)
 
     # Start the study
-    print_info("trials", f"{n_trials} x {n_folds} folds = {n_trials * n_folds} fits")
+    print_info("trials", f"{n_trials} x {n_folds} folds x {N_REPEATS} repeats = "
+                         f"{n_trials * n_folds * N_REPEATS} fits")
     study = optuna.create_study(
             direction="maximize", sampler=optuna.samplers.TPESampler(seed=RANDOM_STATE)
             )

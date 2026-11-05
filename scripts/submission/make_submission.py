@@ -41,7 +41,7 @@ def main():
 
     path = make_submission(X_test.index, predictions, f"submission_{name}.csv")
     print_info("predictions", len(predictions))
-    # Close to 0.5, like in the train set
+    # Sanity check: the share of test battles predicted as Player 1 wins
     print_info("share of Player 1 wins", f"{predictions.mean():.3f}")
     print_info("same ids as sample", matches_sample_submission(X_test.index))
     print_saved(path)

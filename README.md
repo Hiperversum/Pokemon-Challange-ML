@@ -97,7 +97,7 @@ python main.py
 ```json5
 run: {
     command: "submit",        // what to do (the list of commands is written above it)
-    model: "voting_best",     // one model: submit, tune, ablation
+    model: "voting",          // one model: submit, tune, ablation
     models: [],               // several models: compare, compare-tuned, pca ([] = all)
     trials: 50,               // Optuna trials of tune
 },
@@ -123,8 +123,11 @@ models, trials) from this file.
    - *bags*: counts of species and moves seen in the battle.
    - *endstate*: health of the Pokemon still alive, low-HP Player 2 Pokemon on the
      bench treated as hidden KOs, trend of the HP difference during the 30 turns,
-     HP left of each frequent species.
-2. **Validation**: stratified 5-fold cross-validation on `train.jsonl`; the
+     HP left of each frequent species. Expected hidden KOs: a Player 2 faint is written almost
+     only when a Player 1 Pokemon faints in the same turn, so for each kind of exit from the field
+     the extra Player 2 exits (compared with Player 1) give the share of hidden KOs.
+2. **Validation**: stratified 5-fold cross-validation on `train.jsonl`; Optuna scores each
+   trial on the 5 folds repeated 3 times with different splits. The
    public leaderboard is only used as a sanity check.
 3. **Models**: logistic regression (L1/L2), kNN, decision tree, random forest and
    XGBoost, then soft voting and stacking ensembles of logistic regression, kNN,

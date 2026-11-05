@@ -26,7 +26,7 @@ def main():
     # The models written in config.json5 ([] = all the models of the catalog)
     names = run_models(MODEL_FACTORIES)
     X, y, _ = load_dataset()
-    # Each model with the default hyperparameters of catalog.py
+    # Each model with the default hyperparameters of its file in src/models/classifiers
     models = {name: build_model(name) for name in names}
 
     #---------------------------

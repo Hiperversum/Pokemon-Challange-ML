@@ -20,7 +20,7 @@ def team_features(battle):
     #---------------------------
 
     for stat in STATS:
-        # The value of this stat for each of the 6 Pokemon, e.g. speed: [61, 100, 45, 65, 120, 115]
+        # The value of this stat for each of the 6 Pokemon of the team
         values = np.array([p[f"base_{stat}"] for p in team], dtype=float)
         feats[f"p1_team_{stat}_mean"] = values.mean()
         feats[f"p1_team_{stat}_max"] = values.max()
