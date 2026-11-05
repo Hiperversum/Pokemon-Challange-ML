@@ -22,6 +22,8 @@ BENCH_THRESHOLDS = (0.2, 0.35, 0.5)
 STATUS_WEIGHT = {"frz": 0.4, "slp": 0.8, "par": 0.9, "tox": 0.9}
 # A benched Player 2 Pokemon at or below this HP is treated as a probable hidden KO
 HIDDEN_KO_HP = 0.35
+# Spikes take 1/8 of the HP of the Pokemon that comes in
+SPIKES_DAMAGE = 0.13
 
 
 ####################################################################################
@@ -97,7 +99,7 @@ def last_exits(battle, side):
         move = timeline[row + 1].get(f"{opp}_move_details")
         exits[name] = (state["hp_pct"], (
             bool(move) and move["category"] != "status",
-            newcomer["hp_pct"] < newcomer_hp - 0.13,
+            newcomer["hp_pct"] < newcomer_hp - SPIKES_DAMAGE,
             new_opp["name"] == old_opp["name"] and new_opp["hp_pct"] < old_opp["hp_pct"],
             min(int(state["hp_pct"] * 4), 3),
         ))
@@ -211,7 +213,8 @@ class EndState:
         feats["end_p2_hp_adjusted"] = p2_hp_adjusted
         feats["end_hp_adjusted_diff"] = sum(hp["p1"].values()) - p2_hp_adjusted
 
-        # The same with the expected hidden KOs: each benched Player 2 Pokemon counts as its kind of exit
+        # Expected hidden KOs: each benched Player 2 Pokemon is weighted by the share of hidden KOs
+        # of its kind of exit
         hidden = {name: self.hidden_ko_share.get(kind, 0.0) for name, (_, kind) in last_exits(battle, "p2").items()}
         feats["hidden_ko_estimate"] = sum(hidden.values())
         feats["ko_diff_estimated"] = (sum(s == "fnt" for s in status["p2"].values()) + feats["hidden_ko_estimate"]
