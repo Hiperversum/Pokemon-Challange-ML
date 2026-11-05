@@ -12,7 +12,7 @@ the competition data plus the supplied Gen 2 type chart.
 ## Repository structure
 
 ```
-Pokemon-Challange-ML/
+Pokemon-Challenge-ML/
 ├── main.py                    entry point: python main.py (runs what config.json5 says)
 ├── config.json5               settings: what to run, commands, dataset, output, validation
 ├── data/                      competition files (not versioned, see below)
