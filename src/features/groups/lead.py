@@ -1,6 +1,6 @@
 """Static features comparing the lead of Player 2 with the lead of Player 1."""
 
-from ... import config
+from ...utility.config.config_constants import STATS
 from ..core.pokedex import base_total
 
 
@@ -19,7 +19,7 @@ def lead_features(battle):
     # STATS: the lead of Player 2 and the difference with the lead of Player 1 (12 features)
     #---------------------------
 
-    for stat in config.STATS:
+    for stat in STATS:
         feats[f"p2_lead_{stat}"] = p2_lead[f"base_{stat}"]
         # Positive = the lead of Player 1 is better in this stat
         feats[f"lead_{stat}_diff"] = p1_lead[f"base_{stat}"] - p2_lead[f"base_{stat}"]

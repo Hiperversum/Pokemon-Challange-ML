@@ -1,0 +1,10 @@
+{
+    "voting": {
+        "type": "voting",
+        "models": ["logreg", "knn", "random_forest", "xgboost"]
+    },
+    "stacking": {
+        "type": "stacking",
+        "models": ["logreg", "knn", "random_forest", "xgboost"]
+    }
+}

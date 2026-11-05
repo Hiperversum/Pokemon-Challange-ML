@@ -1,0 +1,28 @@
+{
+    "logreg": {
+        "params": {
+            "C": 0.02996,
+            "penalty": "l1"
+        },
+        "val_acc": 0.682
+    },
+    "random_forest": {
+        "params": {
+            "min_samples_leaf": 2,
+            "max_features": 0.02859
+        },
+        "val_acc": 0.6748
+    },
+    "xgboost": {
+        "params": {
+            "n_estimators": 650,
+            "learning_rate": 0.0536,
+            "max_depth": 2,
+            "min_child_weight": 12,
+            "subsample": 0.779,
+            "colsample_bytree": 0.41,
+            "reg_lambda": 0.0134
+        },
+        "val_acc": 0.6825
+    }
+}

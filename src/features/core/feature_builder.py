@@ -2,10 +2,9 @@
 
 import pandas as pd
 
-from ... import config
+from ...utility.config.config_constants import ID_COLUMN, TARGET
 from ..groups.bags import BagOfTokens
 from ..groups.endstate import EndState
-from ..groups.simulation import BattleSimulation
 from ..groups.matchup import matchup_features
 from ..groups.lead import lead_features
 from ..groups.team import team_features
@@ -23,7 +22,7 @@ class FeatureBuilder:
     Call fit() on the training battles before transform().
     """
 
-    GROUPS = ("team", "lead", "matchup", "timeline", "bags", "endstate", "simulation")
+    GROUPS = ("team", "lead", "matchup", "timeline", "bags", "endstate")
 
     #---------------------------
     # CREATE: keep the tools and choose the groups
@@ -37,12 +36,9 @@ class FeatureBuilder:
         # The groups to compute: all of them unless a list is given (ablation)
         self.groups = tuple(groups) if groups else self.GROUPS
 
-        # The bags still have no vocabulary: fit() will learn it
+        # The groups that still have to learn from the training battles: fit() will do it
         self.bags = BagOfTokens(min_count=bag_min_count)
-        # The species vocabulary of the end-state group is also learned in fit()
         self.endstate = EndState()
-        # The simulation learns species stats, types and usual attacks in fit()
-        self.simulation = BattleSimulation(type_chart)
 
     #---------------------------
     # FIT: learn from the training battles
@@ -54,8 +50,6 @@ class FeatureBuilder:
             self.bags.fit(battles)
         if "endstate" in self.groups:
             self.endstate.fit(battles)
-        if "simulation" in self.groups:
-            self.simulation.fit(battles)
         return self
 
     #---------------------------
@@ -78,8 +72,6 @@ class FeatureBuilder:
             feats.update(self.bags.features(battle))
         if "endstate" in self.groups:
             feats.update(self.endstate.features(battle, self.pokedex))
-        if "simulation" in self.groups:
-            feats.update(self.simulation.features(battle))
         return feats
 
     def transform(self, battles):
@@ -88,11 +80,11 @@ class FeatureBuilder:
         rows = []
         for battle in battles:
             feats = self.battle_features(battle)
-            feats[config.ID_COLUMN] = battle[config.ID_COLUMN]
+            feats[ID_COLUMN] = battle[ID_COLUMN]
             rows.append(feats)
 
         # The list of dictionaries becomes a table: one row per battle, one column per feature
-        return pd.DataFrame(rows).set_index(config.ID_COLUMN).fillna(0.0)
+        return pd.DataFrame(rows).set_index(ID_COLUMN).fillna(0.0)
 
 
 ####################################################################################
@@ -102,7 +94,7 @@ class FeatureBuilder:
 def extract_target(battles):
     """Return the player_won labels as a Series indexed by battle_id."""
     return pd.Series(
-        [int(b[config.TARGET]) for b in battles],
-        index=[b[config.ID_COLUMN] for b in battles],
-        name=config.TARGET,
+        [int(b[TARGET]) for b in battles],
+        index=[b[ID_COLUMN] for b in battles],
+        name=TARGET,
     )

@@ -6,7 +6,8 @@
 import time
 from contextlib import contextmanager
 
-from ... import config
+from ..config.config_constants import N_FOLDS, RANDOM_STATE
+from ..config.config_paths import get_data_dir, get_output_root
 
 LINE_WIDTH = 72
 
@@ -70,22 +71,28 @@ def timed_step(text):
 # COMMANDS
 ####################################################################################
 
-def print_run_header(command, script, arguments):
+def print_run_header(command, script):
     """Show which command is going to run and with which settings."""
-    print_title(f"python main.py: {command} {' '.join(arguments)}".rstrip())
+    print_title(f"python main.py: {command}")
     print_info("script", script)
-    print_info("data folder", config.get_data_dir())
-    print_info("output folder", config.get_output_root())
-    print_info("seed / folds", f"{config.RANDOM_STATE} / {config.N_FOLDS}")
+    print_info("data folder", get_data_dir())
+    print_info("output folder", get_output_root())
+    print_info("seed / folds", f"{RANDOM_STATE} / {N_FOLDS}")
 
 
 def print_commands(commands, chosen):
     """List the available commands and say which one is chosen in config.json5."""
     print("Available commands:")
-    for name, entry in commands.items():
-        print(f"  {name:<18} {entry['script']}")
+    for name, script in commands.items():
+        print(f"  {name:<18} {script}")
     print()
     print(f"Chosen in config.json5: {chosen}", flush=True)
+
+
+def print_wrong_value(value, allowed):
+    """Say that a model written in config.json5 cannot be used by this command, and list the valid ones."""
+    print(f'"{value}" cannot be used by this command.')
+    print(f"Valid names: {', '.join(allowed)}", flush=True)
 
 
 ####################################################################################
@@ -112,6 +119,16 @@ def print_trial(number, total, score, best):
     """Show the k-fold accuracy of one Optuna trial and the best one so far."""
     marker = "  <- new best" if score >= best else ""
     print(f"  trial {number:>3}/{total}  val={score:.4f}  best={best:.4f}{marker}", flush=True)
+
+
+def print_params_update(name, new_val_acc, old_val_acc, saved):
+    """Say whether tuned_params.json now holds the new hyperparameters of a model."""
+    if not saved:
+        print_step(f"tuned_params.json: {name} kept (new {new_val_acc:.4f} <= saved {old_val_acc:.4f})")
+    elif old_val_acc is None:
+        print_step(f"tuned_params.json: {name} added ({new_val_acc:.4f})")
+    else:
+        print_step(f"tuned_params.json: {name} updated ({old_val_acc:.4f} -> {new_val_acc:.4f})")
 
 
 def print_scores(label, train_acc, val_acc, val_std, width=26):

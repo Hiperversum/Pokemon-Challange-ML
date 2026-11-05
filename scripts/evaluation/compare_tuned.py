@@ -1,38 +1,49 @@
 """Compare the tuned single models and the ensembles with stratified k-fold CV.
 
-Usage: python scripts/evaluation/compare_tuned.py [--models logreg voting ...]
+Started by main.py with command: "compare-tuned" in config.json5 (reads run.models).
 """
 
-import argparse
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.validation import compare_models  # noqa: E402
-from src.models.presets import (  # noqa: E402
-    ENSEMBLES, PCA_MODELS, TUNED_MODELS, build_named_model,
+from src.utility.config.config_constants import N_FOLDS
+from src.utility.config.config_paths import get_output_dir
+from src.utility.config.config_run import run_models
+from src.evaluation.validation import compare_models
+from src.models.core.model_builder import (
+    ENSEMBLES, TUNED_MODELS, build_ensemble, build_tuned_model,
 )
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_saved, print_section, print_step, print_table  # noqa: E402
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import print_saved, print_section, print_step, print_table
 
 
-def parse_args():
-    """Read the command line options."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models", nargs="+", default=list(TUNED_MODELS) + list(PCA_MODELS) + list(ENSEMBLES))
-    return parser.parse_args()
-
+####################################################################################
+# COMPARE THE TUNED MODELS AND THE ENSEMBLES
+####################################################################################
 
 def main():
     """Build the features and print the cross-validation table of the tuned models."""
-    args = parse_args()
+
+    #---------------------------
+    # MODELS AND FEATURES
+    #---------------------------
+
+    # The models written in config.json5 ([] = all the tuned models and all the ensembles)
+    names = run_models(list(TUNED_MODELS) + list(ENSEMBLES))
     X, y, _ = load_dataset()
-    models = {name: build_named_model(name, X.columns) for name in args.models}
-    print_step(f"Cross-validating {len(models)} tuned models and ensembles with {config.N_FOLDS} folds")
+    # Ensembles from ensembles.json, single models with the hyperparameters of tuned_params.json
+    models = {name: build_ensemble(name) if name in ENSEMBLES else build_tuned_model(name)
+              for name in names}
+
+    #---------------------------
+    # CROSS-VALIDATION: one row per model, sorted by validation accuracy
+    #---------------------------
+
+    print_step(f"Cross-validating {len(models)} tuned models and ensembles with {N_FOLDS} folds")
     table = compare_models(models, X.values, y.values)
-    out_path = config.get_output_dir() / "tuned_comparison.csv"
+
+    #---------------------------
+    # SAVE AND SHOW THE TABLE
+    #---------------------------
+
+    out_path = get_output_dir("compare_tuned") / "tuned_comparison.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")
     print_table(table)

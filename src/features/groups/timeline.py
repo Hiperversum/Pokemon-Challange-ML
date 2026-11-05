@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ... import config
+from ...utility.config.config_constants import STATS, STATUSES, TEAM_SIZE
 
 SIDES = ("p1", "p2")
 SNAPSHOT_TURNS = (10, 20)
@@ -67,7 +67,7 @@ class SideState:
     def hp_remaining(self):
         """Total HP fraction left, counting unrevealed Pokemon at full health."""
         # A Pokemon we never saw is probably still in perfect shape: it counts as 1.0
-        unrevealed = config.TEAM_SIZE - len(self.hp)
+        unrevealed = TEAM_SIZE - len(self.hp)
         return sum(self.hp.values()) + max(unrevealed, 0)
 
     #---------------------------
@@ -164,7 +164,7 @@ def remaining_strength(side_state, team_totals, default_total):
         strength += hp * team_totals.get(name, default_total)
 
     # The Pokemon never seen count as healthy, with an average strength
-    unrevealed = config.TEAM_SIZE - len(side_state.hp)
+    unrevealed = TEAM_SIZE - len(side_state.hp)
     strength += max(unrevealed, 0) * default_total
     return strength
 
@@ -190,8 +190,8 @@ def active_features(states, pokedex, type_chart):
     p2_types = pokedex.types(p2.active)
     feats["active_matchup"] = type_chart.matchup_score(p1_types, p2_types)
     feats["active_speed_diff"] = pokedex.stat(p1.active, "spe") - pokedex.stat(p2.active, "spe")
-    p1_total = sum(pokedex.stat(p1.active, s) for s in config.STATS)
-    p2_total = sum(pokedex.stat(p2.active, s) for s in config.STATS)
+    p1_total = sum(pokedex.stat(p1.active, s) for s in STATS)
+    p2_total = sum(pokedex.stat(p2.active, s) for s in STATS)
     feats["active_total_diff"] = p1_total - p2_total
     return feats
 
@@ -210,8 +210,8 @@ def difference_features(feats):
     # Positive means Player 1 has knocked out more Pokemon than it has lost.
     diffs["fainted_diff"] = feats["p2_fainted"] - feats["p1_fainted"]
     diffs["statused_diff"] = (
-        sum(feats[f"p2_end_{s}"] for s in config.STATUSES)
-        - sum(feats[f"p1_end_{s}"] for s in config.STATUSES)
+        sum(feats[f"p2_end_{s}"] for s in STATUSES)
+        - sum(feats[f"p1_end_{s}"] for s in STATUSES)
     )
     return diffs
 
@@ -260,7 +260,7 @@ def timeline_features(battle, pokedex, type_chart):
         alive_hp = [hp for name, hp in st.hp.items() if st.status.get(name) != "fnt"]
         feats[f"{side}_alive_hp_mean"] = np.mean(alive_hp) if alive_hp else 0.0
         # How many Pokemon have each status at the end
-        for status in config.STATUSES:
+        for status in STATUSES:
             feats[f"{side}_end_{status}"] = sum(s == status for s in st.status.values())
         # No KO at all: the first KO "happens" after the last turn
         feats[f"{side}_first_faint_turn"] = st.first_faint_turn or (n_turns + 1)
@@ -276,10 +276,10 @@ def timeline_features(battle, pokedex, type_chart):
 
     # Base-stat strength left on each side (Player 2's hidden members use the
     # average of Player 1's team as a neutral guess).
-    p1_totals = {p["name"]: sum(p[f"base_{s}"] for s in config.STATS) for p in battle["p1_team_details"]}
+    p1_totals = {p["name"]: sum(p[f"base_{s}"] for s in STATS) for p in battle["p1_team_details"]}
     default_total = float(np.mean(list(p1_totals.values())))
     p2_totals = {
-        name: sum(pokedex.stat(name, s, default_total / 6) for s in config.STATS)
+        name: sum(pokedex.stat(name, s, default_total / 6) for s in STATS)
         for name in states["p2"].hp
     }
     feats["p1_strength_left"] = remaining_strength(states["p1"], p1_totals, default_total)

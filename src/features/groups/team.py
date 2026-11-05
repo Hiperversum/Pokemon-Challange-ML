@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ... import config
+from ...utility.config.config_constants import STATS
 from ..core.pokedex import base_total, clean_types
 
 
@@ -19,7 +19,7 @@ def team_features(battle):
     # STATS: mean, max and min of each of the 6 base stats (18 features)
     #---------------------------
 
-    for stat in config.STATS:
+    for stat in STATS:
         # The value of this stat for each of the 6 Pokemon, e.g. speed: [61, 100, 45, 65, 120, 115]
         values = np.array([p[f"base_{stat}"] for p in team], dtype=float)
         feats[f"p1_team_{stat}_mean"] = values.mean()

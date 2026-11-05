@@ -1,42 +1,47 @@
 """Train a tuned model or ensemble on the full training set and write a submission file.
 
-Usage:
-    python scripts/submission/make_submission.py --model hist_gradient_boosting
-    python scripts/submission/make_submission.py --model voting
-    python scripts/submission/make_submission.py --model pca_logistic
+Started by main.py with command: "submit" in config.json5 (reads run.model).
 """
 
-import argparse
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src.models.catalog import MODEL_FACTORIES  # noqa: E402
-from src.models.presets import ENSEMBLES, PCA_MODELS, build_named_model  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.models.submission import fit_and_predict, make_submission, matches_sample_submission  # noqa: E402
-from src.utility.print.messages import print_info, print_saved, print_step, timed_step  # noqa: E402
+from src.utility.config.config_run import run_model
+from src.models.core.model_builder import ENSEMBLES, MODEL_FACTORIES, build_ensemble, build_tuned_model
+from src.features.load_dataset import load_dataset
+from src.models.submission import fit_and_predict, make_submission, matches_sample_submission
+from src.utility.print.messages import print_info, print_saved, print_step, timed_step
 
 
-def parse_args():
-    """Read the command line options."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", default="hist_gradient_boosting",
-                        choices=sorted(MODEL_FACTORIES) + sorted(ENSEMBLES) + sorted(PCA_MODELS))
-    return parser.parse_args()
-
+####################################################################################
+# SUBMISSION FOR KAGGLE
+####################################################################################
 
 def main():
     """Fit the chosen model and save its test predictions."""
-    args = parse_args()
+
+    #---------------------------
+    # MODEL AND FEATURES
+    #---------------------------
+
+    # The model written in config.json5: a single model or an ensemble
+    name = run_model(sorted(MODEL_FACTORIES) + sorted(ENSEMBLES))
+    # Here the test features are needed too
     X_train, y_train, X_test = load_dataset()
-    model = build_named_model(args.model, X_train.columns)
-    print_step(f"Model: {args.model}")
+    model = build_ensemble(name) if name in ENSEMBLES else build_tuned_model(name)
+    print_step(f"Model: {name}")
+
+    #---------------------------
+    # TRAIN ON THE WHOLE TRAIN SET AND PREDICT THE TEST BATTLES
+    #---------------------------
+
     with timed_step("Training on the full train set and predicting the test battles"):
         predictions = fit_and_predict(model, X_train, y_train, X_test)
-    path = make_submission(X_test.index, predictions, f"submission_{args.model}.csv")
+
+    #---------------------------
+    # WRITE THE FILE AND CHECK IT
+    #---------------------------
+
+    path = make_submission(X_test.index, predictions, f"submission_{name}.csv")
     print_info("predictions", len(predictions))
+    # Close to 0.5, like in the train set
     print_info("share of Player 1 wins", f"{predictions.mean():.3f}")
     print_info("same ids as sample", matches_sample_submission(X_test.index))
     print_saved(path)

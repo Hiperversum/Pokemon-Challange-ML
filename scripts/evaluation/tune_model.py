@@ -1,39 +1,64 @@
-"""Grid search the hyperparameters of one model with k-fold CV.
+"""Search the hyperparameters of one model with Optuna and k-fold CV.
 
-Usage: python scripts/evaluation/tune_model.py --model logreg
+The best hyperparameters are saved in data/models/tuned_params.json when they beat the saved ones.
+
+Started by main.py with command: "tune" in config.json5 (reads run.model and run.trials).
 """
 
-import argparse
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.tuning import PARAM_GRIDS, grid_search  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_info, print_saved, print_section, print_step, print_table  # noqa: E402
+from src.utility.config.config_paths import get_output_dir
+from src.utility.config.config_run import run_model, run_trials
+from src.utility.model.load_params import save_params
+from src.evaluation.tuning import OPTUNA_SPACES, optuna_search
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import (
+    print_info, print_params_update, print_saved, print_section, print_step, print_table,
+)
 
 
-def parse_args():
-    """Read the command line options."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True, choices=sorted(PARAM_GRIDS))
-    return parser.parse_args()
-
+####################################################################################
+# TUNE ONE MODEL WITH OPTUNA
+####################################################################################
 
 def main():
-    """Run the grid search and save the full results table."""
-    args = parse_args()
+    """Run the Optuna search, save the table of all the trials and the best hyperparameters."""
+
+    #---------------------------
+    # MODEL, TRIALS AND FEATURES
+    #---------------------------
+
+    # The model and the number of trials written in config.json5
+    model = run_model(sorted(OPTUNA_SPACES))
+    trials = run_trials()
     X, y, _ = load_dataset()
-    print_step(f"Tuning {args.model}")
-    best_params, table = grid_search(args.model, X.values, y.values)
-    out_path = config.get_output_dir() / f"grid_{args.model}.csv"
+
+    #---------------------------
+    # SEARCH: each trial is one combination scored with k-fold CV
+    #---------------------------
+
+    print_step(f"Tuning {model} with Optuna")
+    best_params, table = optuna_search(model, X.values, y.values, n_trials=trials)
+
+    #---------------------------
+    # SAVE AND SHOW THE TRIALS
+    #---------------------------
+
+    out_path = get_output_dir("tune") / f"tune_{model}.csv"
     table.to_csv(out_path, index=False)
-    print_section("Top 10 combinations")
-    print_table(table.head(10))
+    # Only the trial number, its accuracy and the values it tried
+    columns = ["number", "value"] + [c for c in table.columns if c.startswith("params_")]
+    print_section("Top 10 trials")
+    print_table(table[columns].head(10))
     print_info("best parameters", best_params)
     print_saved(out_path)
+
+    #---------------------------
+    # UPDATE tuned_params.json (only if the new accuracy is higher)
+    #---------------------------
+
+    # The table is sorted from the best trial, so the first value is the best accuracy
+    best_val_acc = table["value"].iloc[0]
+    saved, old_val_acc = save_params(model, best_params, best_val_acc)
+    print_params_update(model, best_val_acc, old_val_acc, saved)
 
 
 if __name__ == "__main__":

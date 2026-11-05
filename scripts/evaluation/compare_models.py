@@ -1,36 +1,46 @@
 """Compare all base models with stratified k-fold cross-validation.
 
-Usage: python scripts/evaluation/compare_models.py [--models logreg random_forest ...]
+Started by main.py with command: "compare" in config.json5 (reads run.models).
 """
 
-import argparse
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from src import config  # noqa: E402
-from src.evaluation.validation import compare_models  # noqa: E402
-from src.models.catalog import MODEL_FACTORIES, build_model  # noqa: E402
-from src.features.load_dataset import load_dataset  # noqa: E402
-from src.utility.print.messages import print_saved, print_section, print_step, print_table  # noqa: E402
+from src.utility.config.config_constants import N_FOLDS
+from src.utility.config.config_paths import get_output_dir
+from src.utility.config.config_run import run_models
+from src.evaluation.validation import compare_models
+from src.models.core.model_builder import MODEL_FACTORIES, build_model
+from src.features.load_dataset import load_dataset
+from src.utility.print.messages import print_saved, print_section, print_step, print_table
 
 
-def parse_args():
-    """Read the command line options."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models", nargs="+", default=list(MODEL_FACTORIES))
-    return parser.parse_args()
-
+####################################################################################
+# COMPARE THE BASE MODELS: k-fold accuracy with the default hyperparameters
+####################################################################################
 
 def main():
     """Build the features and print the cross-validation table."""
-    args = parse_args()
+
+    #---------------------------
+    # MODELS AND FEATURES
+    #---------------------------
+
+    # The models written in config.json5 ([] = all the models of the catalog)
+    names = run_models(MODEL_FACTORIES)
     X, y, _ = load_dataset()
-    models = {name: build_model(name) for name in args.models}
-    print_step(f"Cross-validating {len(models)} models with {config.N_FOLDS} folds")
+    # Each model with the default hyperparameters of catalog.py
+    models = {name: build_model(name) for name in names}
+
+    #---------------------------
+    # CROSS-VALIDATION: one row per model, sorted by validation accuracy
+    #---------------------------
+
+    print_step(f"Cross-validating {len(models)} models with {N_FOLDS} folds")
     table = compare_models(models, X.values, y.values)
-    out_path = config.get_output_dir() / "model_comparison.csv"
+
+    #---------------------------
+    # SAVE AND SHOW THE TABLE
+    #---------------------------
+
+    out_path = get_output_dir("compare") / "model_comparison.csv"
     table.to_csv(out_path, index=False)
     print_section("Results")
     print_table(table)

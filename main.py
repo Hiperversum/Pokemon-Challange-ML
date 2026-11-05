@@ -3,20 +3,16 @@
 What to run is chosen in config.json5 (section "run"), not on the command line.
 """
 
-from src import config
-from src.utility.command import choose_command, options_to_arguments, run_script
+from src.utility.config.config_run import choose_command, run_script
 
 
 def main():
     """Run the command chosen in config.json5."""
-    # The command, its script and the values of "run" it reads, as written in config.json5
-    command, script, names = choose_command()
+    # The command written in config.json5 and the script that runs it
+    command, script = choose_command()
 
-    # Those values, written as command line arguments
-    arguments = options_to_arguments(names, config.RUN_SETTINGS)
-
-    # Run the script
-    run_script(command, script, arguments)
+    # Run the script: it reads its model, models or trials from config.json5 by itself
+    run_script(command, script)
 
 
 if __name__ == "__main__":
